@@ -1,13 +1,19 @@
-import java.util.List;
-class Proto_Subrule
+import java.util.ArrayList;
+
+enum Flags{
+	//S A F R P U
+	SYN, ACK, FIN, RST, PUSH, URG
+}
+
+class Subrule
 {
 	String send;
 	String recv;
+	boolean[] flags;
 	
-	String string;
-	String ip;
-	int port;
-	String flags; //TCP flags
+	Subrule(){
+		flags = new boolean[6];
+	}
 }
 public class rule
 {
@@ -19,9 +25,8 @@ public class rule
 	String ip;
 	String send;
 	String recv;
-	String flags;
+	ArrayList<Subrule> subRules;
 	
-
 	public rule()
 	{
 		name = "blank rule";
@@ -32,6 +37,6 @@ public class rule
 		ip = "";
 		send = "";
 		recv = "";
-		flags = "";
+		subRules = new ArrayList<Subrule>();
 	}
 }
