@@ -1,34 +1,16 @@
-import java.io.IOException;
-import java.util.Vector;
-
-
-
-
-
-
-
-/*
- * import jpcap.JpcapCaptor;
-import jpcap.NetworkInterface;
-import jpcap.PacketReceiver;
-import jpcap.packet.IPPacket;
-import jpcap.packet.Packet;
-*/
-
 import net.sourceforge.jpcap.capture.CaptureFileOpenException;
 import net.sourceforge.jpcap.capture.CapturePacketException;
 import net.sourceforge.jpcap.capture.InvalidFilterException;
 import net.sourceforge.jpcap.capture.PacketCapture;
 import net.sourceforge.jpcap.capture.PacketListener;
 import net.sourceforge.jpcap.net.Packet;
-import java.io.*;
 
 class PacketCaptureListener extends PacketCapture implements PacketListener{
 
 	@Override
 	public void packetArrived(Packet packet) {
 		// TODO Auto-generated method stub
-		System.out.println(packet.getHeader().toString());
+		System.out.println(packet.toString());
 	}
 	
 }
@@ -62,9 +44,8 @@ public class pcapreader{
 	
 	public static void main(String[] args) throws CapturePacketException
 	{
-		File test = new File("trace1.pcap");
-		System.out.println(test.getAbsolutePath().toString());
-		readFile("trace1.pcap");
 		System.out.println("Begin capture");
+		readFile("trace1.pcap");
+		
 	}
 }
