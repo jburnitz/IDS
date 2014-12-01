@@ -11,6 +11,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 	public void packetArrived(Packet packet) {
 		// TODO Auto-generated method stub
 		System.out.println(packet.toString());
+		System.out.println("foo");
 	}
 	
 }
