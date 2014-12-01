@@ -7,7 +7,7 @@ import java.io.*;
  * @category Homework
  * @author Joseph Burnitz & Anthony Manetti 
  */
-public class IDS {
+public class snids {
 
 	protected parser rulesParser;
 
