@@ -17,7 +17,8 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 		IPPacket ipPacket = (IPPacket)packet;
 		if(ipPacket.getProtocol() == 6 ) //means its TCP
 			System.out.println(ipPacket.getSourceAddress() + " : " + ((TCPPacket)ipPacket).getSourcePort());
-		
+		else
+			System.out.println("Packet is not TCP");		
 	}
 	
 }
