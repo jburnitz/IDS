@@ -9,6 +9,8 @@ import java.io.*;
  */
 public class IDS {
 
+	protected parser rulesParser;
+
 	//Entry point for application
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -63,6 +65,8 @@ public class IDS {
 					rulesFile[ind] = s;
 					ind++;
 				}
+
+				
 			}
 			else
 			{
