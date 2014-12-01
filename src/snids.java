@@ -8,9 +8,6 @@ import java.io.*;
  * @author Joseph Burnitz & Anthony Manetti 
  */
 public class snids {
-
-	protected parser rulesParser;
-
 	//Entry point for application
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -20,74 +17,72 @@ public class snids {
 			usage();
 			System.exit(-1);
 		}
-		
-		File rules = new File(args[0]);
+
+		File rules = new File(args[1]);
 			
 		if(!rules.exists()){
 			System.err.println("Fatal: File '"+rules.getName()+"' does not exist");
-			System.exit(-2);
+			System.exit(-21);
 		}
 		if(!rules.isFile()){
 			System.err.println("Fatal: File '"+rules.getName()+"' is not a file");
-			System.exit(-3);
+			System.exit(-31);
 		}
 		if(!rules.canRead()){
 			System.err.println("Fatal: File '"+rules.getName()+"' is not readable");
-			System.exit(-3);
+			System.exit(-41);
 		}
 		
-		String line = null; //initialize string to represent line in file
+		File pcap = new File(args[2]);
 		
+		if(!pcap.exists()){
+			System.err.println("Fatal: File '"+pcap.getName()+"' does not exist");
+			System.exit(-22);
+		}
+		if(!pcap.isFile()){
+			System.err.println("Fatal: File '"+pcap.getName()+"' is not a file");
+			System.exit(-32);
+		}
+		if(!pcap.canRead()){
+			System.err.println("Fatal: File '"+pcap.getName()+"' is not readable");
+			System.exit(-42);
+		}
+				
 		try 
-		{ //try
+		{
 			// FileReader reads text files in the default encoding.
-			FileReader fileReader =
-			new FileReader(rules); //fileReader instance
-			// Always wrap FileReader in BufferedReader.
-			BufferedReader bufferedReader =
-			new BufferedReader(fileReader);
+			FileReader fileReader =	new FileReader(rules);
 			
+			// Always wrap FileReader in BufferedReader.
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			
+			//declare string for each line in file
+			String line = null;
+
 			ArrayList<String> list = new ArrayList<String>();
 			
+			//until we reach empty space in file
 			while((line = bufferedReader.readLine()) != null)
-			{ //until we reach empty space in file
 				list.add(line);
-			}
 			
-			if(list.size() > 0)
-			{
-				String[] rulesFile = new String[list.size()];
-				
-				int ind = 0;
-				
-				for(String s : list)
-				{
-					rulesFile[ind] = s;
-					ind++;
-				}
-
-				
-			}
-			else
-			{
-				System.err.println("\nNo Data Found\n");
-			}
+			//we're done with the file
+			bufferedReader.close();
+			
+			parser ruleParser = new parser((String[]) list.toArray());
+			//ruleParser.parse()
 		}
 		catch(FileNotFoundException ex) { //catch exception for file not there
 			System.err.println(
 			"Unable to open file '" +
 			args[0] + "' [FILE NOT FOUND]");
-			//System.exit(1);
+			System.exit(-21);
 		}
 		catch(IOException ex) { //catch exception for file corrupted
 			System.err.println(
 			"Error reading file '"
 			+ args[0] + "'");
-			//System.exit(1);
-			// Or we could just do this:
-			// ex.printStackTrace();
+			System.exit(-41);
 		}
-
 	}
 	//How to use the IDS
 	protected static void usage(){
