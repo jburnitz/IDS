@@ -14,6 +14,8 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 		String[] tokens = packet.toString().split(" ");
 		String ip = tokens[1];
 		System.out.println("source ip = " + ip);
+		System.out.println("destination ip = " + tokens[3]);
+		System.out.println("flag = " + tokens[4].charAt(0));
 	}
 	
 }
