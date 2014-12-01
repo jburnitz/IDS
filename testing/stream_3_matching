@@ -1,0 +1,8 @@
+host=131.193.40.156
+
+name=#+stream_3_matching
+type=stream
+local_port=any
+remote_port=110
+ip=any
+send="USER.*PASS"

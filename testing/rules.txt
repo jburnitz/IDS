@@ -1,0 +1,136 @@
+
+This is not a rule file (does not match grammar). It is a sample file
+that contains some rules and their descriptions. 
+
+###################################
+Attack 1
+
+host=192.168.0.1
+
+name=this is rule 1
+type=protocol
+proto=tcp
+local_port=5551
+remote_port=any
+ip=any
+recv="Now I own your computer"
+
+Try with: trace1.pcap (false positive), trace2.pcap, trace3.pcap (false negative) 
+
+###################################
+
+Attack 2
+
+Same as Attack 1, except use TCP stream reconstruction.
+
+host=192.168.0.1
+
+name=this is rule 2
+type=stream
+local_port=5551
+remote_port=any
+ip=any
+recv="Now I own your computer"
+
+Try with: trace1.pcap (false positive), trace2.pcap, trace3.pcap
+
+###################################
+Attack 3
+
+General Buffer Overflow
+
+A more sophisticated rule which matches a sequence of NOPs followed by a syscall, which might be found in many buffer overflow attacks.
+
+host=192.168.0.1
+
+name=this is rule  3
+type=stream
+local_port=5551
+remote_port=any
+ip=any
+recv="\x90{10}.*\xcd\x80"
+
+Try with: trace1.pcap, trace2.pcap, trace3.pcap
+#
+
+###################################
+Attack 4
+
+Plaintext POP
+
+Detect insecure logins to mailserver
+
+host=192.168.0.1
+
+name=Plaintext POP rule 4
+type=protocol
+proto=tcp
+local_port=110
+remote_port=any
+ip=any
+send="\+OK.*\r\n"
+recv="USER .*\r\n"
+send="\+OK.*\r\n"
+recv="PASS.*\r\n"
+send="\+OK.*\r\n"
+
+Try with: trace4.pcap
+
+###################################
+Attack 5
+
+XMAS port scan
+
+Detect someone attempting to do a XMAS portscan on any port
+
+host=192.168.0.1
+
+name=XMAS scan rule 5
+type=protocol
+proto=tcp
+local_port=any
+remote_port=any
+ip=any
+recv=".*" with flags=FUP
+
+Try with: trace5.pcap
+
+###################################
+Attack 6
+
+NULL scan against webserver
+
+Detect someone attempting to do a NULL scan portscan on the webserver port (80)
+
+host=192.168.0.1
+
+name=NULL scan rule 6
+type=protocol
+proto=tcp
+local_port=80
+remote_port=any
+ip=any
+recv=".*" with flags=
+
+Try with: trace6.pcap
+###################################
+Attack 7
+
+Simulated remote Linux boot
+
+A UDP example, which might be used to detect a compromised host attempting a network boot via TFTP
+
+host=192.168.0.1
+
+name=TFTP remote boot rule 7
+type=protocol
+proto=udp
+local_port=any
+remote_port=69
+ip=any
+send="vmlinuz"
+recv="\x00\x03\x00\x01"
+
+Try with: trace7.pcap
+###################################
+
