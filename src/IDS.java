@@ -1,4 +1,5 @@
-import java.io.File;
+import java.util.*;
+import java.io.*;
 
 /**
  * Java Instrusion Detection System
@@ -31,6 +32,56 @@ public class IDS {
 		if(!rules.canRead()){
 			System.err.println("Fatal: File '"+rules.getName()+"' is not readable");
 			System.exit(-3);
+		}
+		
+		String line = null; //initialize string to represent line in file
+		
+		try 
+		{ //try
+			// FileReader reads text files in the default encoding.
+			FileReader fileReader =
+			new FileReader(rules); //fileReader instance
+			// Always wrap FileReader in BufferedReader.
+			BufferedReader bufferedReader =
+			new BufferedReader(fileReader);
+			
+			ArrayList<String> list = new ArrayList<String>();
+			
+			while((line = bufferedReader.readLine()) != null)
+			{ //until we reach empty space in file
+				list.add(line);
+			}
+			
+			if(list.size() > 0)
+			{
+				String[] rulesFile = new String[list.size()];
+				
+				int ind = 0;
+				
+				for(String s : list)
+				{
+					rulesFile[ind] = s;
+					ind++;
+				}
+			}
+			else
+			{
+				System.err.println("\nNo Data Found\n");
+			}
+		}
+		catch(FileNotFoundException ex) { //catch exception for file not there
+			System.err.println(
+			"Unable to open file '" +
+			args[0] + "' [FILE NOT FOUND]");
+			//System.exit(1);
+		}
+		catch(IOException ex) { //catch exception for file corrupted
+			System.err.println(
+			"Error reading file '"
+			+ args[0] + "'");
+			//System.exit(1);
+			// Or we could just do this:
+			// ex.printStackTrace();
 		}
 
 	}
