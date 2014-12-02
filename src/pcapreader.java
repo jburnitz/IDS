@@ -1,3 +1,5 @@
+import java.io.UnsupportedEncodingException;
+
 import net.sourceforge.jpcap.capture.CaptureFileOpenException;
 import net.sourceforge.jpcap.capture.CapturePacketException;
 import net.sourceforge.jpcap.capture.InvalidFilterException;
@@ -29,7 +31,13 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 		System.out.println("Destination of packet : " + ipPacket.getDestinationAddress());	
 
 		byte[] data = ipPacket.getData();
-		String dataString = new String(data,"UTF-8");
+		String dataString = null;
+		try {
+			dataString = new String(data,"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		System.out.println("Packet data as string : " + dataString);
 
