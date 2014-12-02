@@ -4,6 +4,8 @@ import net.sourceforge.jpcap.capture.InvalidFilterException;
 import net.sourceforge.jpcap.capture.PacketCapture;
 import net.sourceforge.jpcap.capture.PacketListener;
 import net.sourceforge.jpcap.net.Packet;
+import net.sourceforge.jpcap.net.IPPacket;
+import net.sourceforge.jpcap.net.TCPPacket;
 
 class PacketCaptureListener extends PacketCapture implements PacketListener{
 
@@ -12,6 +14,10 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 		// TODO Auto-generated method stub
 		System.out.println(packet.toString());
 		System.out.println("foo");
+		IPPacket ipPacket = (IPPacket)packet;
+		if(ipPacket.getProtocol() == 6 ) //means its TCP
+			System.out.println(ipPacket.getSourceAddress() + " : " + ((TCPPacket)ipPacket).getSourcePort());
+		
 	}
 	
 }
