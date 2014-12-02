@@ -7,8 +7,8 @@ public class rule
 	String remote_port;	//on the sernder's computer
 	String ip;	//the ip that the packet came from
 
-	String send;	//	
-	String recv;	//
+	boolean send;	//is this a send or recv message?	
+	boolean recv;	//
 	String flags;	//
 
 	public rule()
@@ -19,8 +19,8 @@ public class rule
 		local_port = "";
 		remote_port = "";
 		ip = "";
-		send = "";
-		recv = "";
+		send = false;
+		recv = false;
 		flags = "";
 	}
 }

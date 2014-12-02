@@ -115,13 +115,20 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			*/
 			if(!(r.ip.equalsIgnoreCase("any")))
 			{
-				if(srcIPMatch(packet, r.ip) == true)
-					System.out.println("Match in IP");
-				else 
+				if(srcIPMatch(packet, r.ip) == true && r.recv == true)
+					System.out.println("Match in IP for recv message (src ip match)");
+				else if(destIPMatch(packet, r.ip) == true && r.send == true)
+					System.out.println("Match in IP for send packet (dest ip match)");
+				else
 					ruleMatch = false;
 			}
 
-			if(ruleMatch == true) System.out.println(r.name);
+			/*
+				TODO: MATCHING PORTS BETWEEN PACKET/RULE
+			*/
+			
+
+			if(ruleMatch == true) System.out.println("Rule Match - " + r.name);
 	}
 	
 }
