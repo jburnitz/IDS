@@ -3,12 +3,13 @@ public class rule
 	String name;
 	String type;
 	String proto;
-	String local_port;
-	String remote_port;
-	String ip;
-	String send;
-	String recv;
-	String flags;
+	String local_port; //on MY computer
+	String remote_port;	//on the sernder's computer
+	String ip;	//the ip that the packet came from
+
+	String send;	//	
+	String recv;	//
+	String flags;	//
 
 	public rule()
 	{

@@ -78,6 +78,12 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 		else return false;
 	}
 
+
+	/*
+		TAs Note: if we see the "recv" in the message, rule.ip must match the packet's SOURCE address
+		if we see the "send" message, rule.ip must match the packet's DESTINATION address
+	*/
+	
 	public void comparePacketToRule(IPPacket packet, rule r)
 	{
 			//compare packet info with a rule object
