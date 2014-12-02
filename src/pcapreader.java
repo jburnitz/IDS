@@ -42,6 +42,18 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 		System.out.println("Packet data as string : " + dataString);
 	}
 
+	public boolean TCPsrcPortMatch(TCPPacket t, int port)
+	{
+		if(t.getSourcePort() == port) return true;
+		else return false;
+	}
+
+	public boolean UDPsrcPortMatch(UDPPacket u, int port)
+	{
+		if(u.getSourcePort() == port) return true;
+		else return false;
+	}
+
 	public boolean srcIPMatch(IPPacket p, String addr)
 	{
 		if(p.getSourceAddress().equals(addr)) return true;
@@ -75,6 +87,35 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			//packet arrives to compare it to all rules
 
 			//print the name of r if we have a match ( all helpers return true)
+
+			boolean ruleMatch = true;	//change to false if we find something that does not match
+			
+			/*
+				MATCH IN PROTOCOL
+			*/
+			if(isTCP(packet) == true && r.proto.equals("tcp")){
+				//debug
+				System.out.println("Match in protocol (tcp)");
+			}
+			else if(isUDP(packet) == true && r.proto.equals("udp"))
+			{
+				//debug
+				System.out.println("Match in protocol (UDP)");
+			}
+			else ruleMatch = false;
+
+			/*
+				MATCH IN SRC IP ADDRESS
+			*/
+			if(!(r.ip.equalsIgnoreCase("any")))
+			{
+				if(srcIPMatch(packet, r.ip) == true)
+					System.out.println("Match in IP");
+				else 
+					ruleMatch = false;
+			}
+
+			if(ruleMatch == true) System.out.println(r.name);
 	}
 	
 }
