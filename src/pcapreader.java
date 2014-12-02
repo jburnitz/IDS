@@ -19,9 +19,9 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 		// TODO Auto-generated method stub
 		IPPacket ipPacket = (IPPacket)packet;
 
-		if(ipPacket.getProtocol() == 6 ) //means its TCP
+		if(isTCP(ipPacket) == true ) //means its TCP
 			System.out.println("TCP packet from " + ipPacket.getSourceAddress() + " : " + ((TCPPacket)ipPacket).getSourcePort());
-		else if(ipPacket.getProtocol() == 17)
+		else if(isUDP(ipPacket) == true)
 		{	//a udp packet
 			System.out.println("UDP packet from " + ipPacket.getSourceAddress() + " : " + ((UDPPacket)ipPacket).getSourcePort());		
 		}
@@ -40,7 +40,41 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 		}
 
 		System.out.println("Packet data as string : " + dataString);
+	}
 
+	public boolean srcIPMatch(IPPacket p, String addr)
+	{
+		if(p.getSourceAddress().equals(addr)) return true;
+		else return false;
+	}
+
+	public boolean destIPMatch(IPPacket p, String addr)
+	{
+		if(p.getDestinationAddress().equals(addr)) return true;
+		else return false;
+	}
+
+	public boolean isTCP(IPPacket p)
+	{
+		if(p.getProtocol() == 6) return true;
+		else return false;
+	}
+
+	public boolean isUDP(IPPacket p)
+	{
+		if(p.getProtocol() == 17) return true;
+		else return false;
+	}
+
+	public void comparePacketToRule(IPPacket packet, rule r)
+	{
+			//compare packet info with a rule object
+			//using the helper methods above
+		
+			//the goal is to call this method when the
+			//packet arrives to compare it to all rules
+
+			//print the name of r if we have a match ( all helpers return true)
 	}
 	
 }
