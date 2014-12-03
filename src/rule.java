@@ -1,3 +1,14 @@
+import java.util.List;
+class Proto_Subrule
+{
+	String send;
+	String recv;
+	
+	String string;
+	String ip;
+	int port;
+	String flags; //TCP flags
+}
 public class rule
 {
 	String name;
@@ -9,6 +20,7 @@ public class rule
 	String send;
 	String recv;
 	String flags;
+	
 
 	public rule()
 	{
