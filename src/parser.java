@@ -131,4 +131,9 @@ public class parser{
 				System.out.println("FLAGS:		 "+s.flags.toString()+"\n");
 		}
 	}
+
+	public LinkedList<rule> getRules(){
+		return rules;
+	}
 }
+
