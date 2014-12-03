@@ -55,7 +55,18 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 
 		System.out.println("Packet data as string : " + dataString);
 
-		System.out.println("Packet flags : " + packet.getFragmentFlags());
+		for(rule ru : setOfAllRules)
+		{
+			comparePacketToRule(ipPacket, ru);
+
+			/*	TODO: implement subrules
+
+				for(subrule sru : ru.subRules)
+				{
+					comparePacketToSubrule(ipPacket,sru);
+				}
+			*/
+		}
 	}
 
 	public boolean TCPsrcPortMatch(TCPPacket t, int port)
@@ -239,10 +250,10 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 
 public class pcapreader{
 
-	public static void readFile(String filename) throws CapturePacketException {
+	public static void readFile(String filename, ArrayList<rule> rF) throws CapturePacketException {
 		
 		System.out.println("Reading file "+filename);
-		PacketCaptureListener jpcap = new PacketCaptureListener();
+		PacketCaptureListener jpcap = new PacketCaptureListener(rF);
 
 		try {
 			jpcap.openOffline(filename);
@@ -265,10 +276,10 @@ public class pcapreader{
 		}
 	}
 	
-	public static void main(String[] args) throws CapturePacketException
+/*	public static void main(String[] args) throws CapturePacketException
 	{
 		System.out.println("Begin capture");
 		readFile("trace1.pcap");
 		
-	}
+	}*/
 }
