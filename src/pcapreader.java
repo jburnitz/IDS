@@ -145,7 +145,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			*/
 			if(!(r.ip.equalsIgnoreCase("any")))
 			{
-				if(r.recv == true)
+				if(r.recv.length() > 0)
 				{
 					if(srcIPMatch(packet, r.ip) == false)
 					{
@@ -154,7 +154,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 					}
 				}
 				
-				if(r.send == true)
+				if(r.send.length() > 0)
 				{
 					if(destIPMatch(packet, r.ip == false)
 					{
