@@ -1,3 +1,5 @@
+import java.util.*;
+
 import java.io.UnsupportedEncodingException;
 
 import net.sourceforge.jpcap.capture.CaptureFileOpenException;
@@ -14,6 +16,18 @@ import net.sourceforge.jpcap.net.UDPPacket;
 
 class PacketCaptureListener extends PacketCapture implements PacketListener{
 
+	public Arraylist<rule> setOfAllRules;
+
+	public PacketCaptureListener()
+	{
+		setOfAllRules = new ArrayList<rule>();
+	}
+
+	public void setRuleList(ArrayList<rule> r)
+	{
+		setOfAllRules = r;
+	}
+	
 	@Override
 	public void packetArrived(Packet packet) {
 		// TODO Auto-generated method stub
@@ -131,7 +145,15 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			/*
 				TODO: MATCHING PORTS BETWEEN PACKET/RULE
 			*/
+			if(!(r.remote_port.equals("any")))
+			{
+				//a specific port on packet's source addr must match
+			}
 			
+			if(!(r.local_port.equals("any")))
+			{
+				//a specific port on user's computer must match the destination addr:port of the packet
+			}
 
 			if(ruleMatch == true) System.out.println("Rule Match - " + r.name);
 	}
