@@ -38,6 +38,7 @@ public class parser{
 		String left;
 		String right;
 		
+		//we don't know the exact order of the specification in the rule
 		for(int i=1; i<rulesFile.size(); i++){
 			line = rulesFile.get(i).trim();
 			left = line.split("=")[0];
@@ -50,29 +51,49 @@ public class parser{
 			}
 			if(left == "type"){
 				rules.peekFirst().type = right;
-				continue;
-			}
-			if(left == "local_port"){
-				if(right == "any")
-					rules.peekFirst().local_port = 0;
-				else
-					rules.peekFirst().local_port = Integer.parseInt(right);
-				continue;
-			}
-			if(left == "remote_port"){
-				if(right == "any")
-					rules.peekFirst().local_port = 0;
-				else
-					rules.peekFirst().local_port = Integer.parseInt(right);
-				continue;
-			}
-			if(left == "ip"){
-				if(right == "any")
-					rules.peekFirst().ip = "0.0.0.0";
-				else
-					rules.peekFirst().ip = right;
-				continue;
-			}
+				if(right == "stream"){
+					//finish out the stream rule
+					for (int j=i; j<rulesFile.size(); j++ ){
+						
+						line = rulesFile.get(j).trim();
+						left = line.split("=")[0];
+						right = line.split("=")[1];
+						
+						if(left == "local_port"){
+							if(right == "any")
+								rules.peekFirst().local_port = 0;
+							else
+								rules.peekFirst().local_port = Integer.parseInt(right);
+							continue;
+						}
+						if(left == "remote_port"){
+							if(right == "any")
+								rules.peekFirst().local_port = 0;
+							else
+								rules.peekFirst().local_port = Integer.parseInt(right);
+							continue;
+						}
+						
+						if(left == "ip"){
+							if(right == "any")
+								rules.peekFirst().ip = "0.0.0.0";
+							else{
+								rules.peekFirst().ip = right;
+							}
+							continue;
+						}
+						
+						if( left == "name" ){//means we came across a new rule;
+							i=(j-1); //the (-1) so the name can be handled
+						}
+						
+					}//end STREAM Parse loop
+				}//End IF STREAM Type rule
+				else if( right == "protocol"){
+					
+				}
+			}//end IF TYPE == ?
+			
 			if(left == "send" && rules.peekFirst().type == "stream" ){
 				rules.peekFirst().send = right;
 				//in stream rules, both can't exist recv OR send
