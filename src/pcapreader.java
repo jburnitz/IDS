@@ -148,11 +148,15 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			if(!(r.remote_port.equals("any")))
 			{
 				//a specific port on packet's source addr must match
+				
+				//CHECK packet.getSourcePort() depending on tcp/udp
 			}
 			
 			if(!(r.local_port.equals("any")))
 			{
 				//a specific port on user's computer must match the destination addr:port of the packet
+			
+				//CHECK packet.getDestinationPort() depending on tcp/udp
 			}
 
 			if(ruleMatch == true) System.out.println("Rule Match - " + r.name);
