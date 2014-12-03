@@ -206,7 +206,8 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			}
 
 			/*
-				int array of input = {isAck(),isFin(),isPsh(),isRst(),isSyn(),isUrg};
+							S|A|F|R|P|U
+				int array of input = {isSyn(),isAck(),isFin(),isRst(),isPsh(),isUrg};
 
 				e.g. {0,1,0,1,1,1} means 
 				
@@ -229,7 +230,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
           Check the SYN flag, flag indicates the sequence numbers should be synchronized between the sender and receiver to initiate a connection.
 				 boolean 	isUrg()
           Check the URG flag, flag indicates if the urgent pointer is valid.
-			*/
+			*/	
 
 			if(ruleMatch == true) System.out.println("Rule Match - " + r.name);
 	}
