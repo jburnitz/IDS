@@ -16,7 +16,7 @@ import net.sourceforge.jpcap.net.UDPPacket;
 
 class PacketCaptureListener extends PacketCapture implements PacketListener{
 
-	public Arraylist<rule> setOfAllRules;
+	public ArrayList<rule> setOfAllRules;
 
 	public PacketCaptureListener()
 	{
@@ -156,7 +156,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				
 				if(r.send.length() > 0)
 				{
-					if(destIPMatch(packet, r.ip == false)
+					if(destIPMatch(packet, r.ip) == false)
 					{
 						ruleMatch = false;
 						return;
