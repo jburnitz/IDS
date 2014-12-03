@@ -54,6 +54,8 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 		}
 
 		System.out.println("Packet data as string : " + dataString);
+
+		System.out.println("Packet flags : " + packet.getFragmentFlags());
 	}
 
 	public boolean TCPsrcPortMatch(TCPPacket t, int port)
@@ -143,8 +145,6 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			/*
 				MATCH IN SRC IP ADDRESS
 			*/
-			if(!(r.ip.equalsIgnoreCase("any")))
-			{
 				if(r.recv.length() > 0)
 				{
 					if(srcIPMatch(packet, r.ip) == false)
@@ -162,12 +162,11 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 						return;
 					}
 				}
-			}
 
 			/*
 				TODO: MATCHING PORTS BETWEEN PACKET/RULE
 			*/
-			if(!(r.remote_port.equals("any")))
+			if(r.remote_port > 0)
 			{
 				//a specific port on packet's source addr must match
 				
@@ -187,7 +186,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				
 			}
 			
-			if(!(r.local_port.equals("any")))
+			if(r.local_port > 0)
 			{
 				//a specific port on user's computer must match the destination addr:port of the packet
 			
@@ -205,6 +204,32 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				else ruleMatch = false;	
 				
 			}
+
+			/*
+				int array of input = {isAck(),isFin(),isPsh(),isRst(),isSyn(),isUrg};
+
+				e.g. {0,1,0,1,1,1} means 
+				
+				for each bit, AND the isAck()...isSyn()
+		
+				if the array is changed their is no match		
+		
+				Compare flags
+
+				for a tcp:
+				  boolean 	isAck()
+          Check the ACK flag, flag indicates if the ack number is valid.
+				 boolean 	isFin()
+          Check the FIN flag, flag indicates the sender is finished sending.
+				 boolean 	isPsh()
+          Check the PSH flag, flag indicates the receiver should pass the data to the application as soon as possible.
+				 boolean 	isRst()
+          Check the RST flag, flag indicates the session should be reset between the sender and the receiver.
+				 boolean 	isSyn()
+          Check the SYN flag, flag indicates the sequence numbers should be synchronized between the sender and receiver to initiate a connection.
+				 boolean 	isUrg()
+          Check the URG flag, flag indicates if the urgent pointer is valid.
+			*/
 
 			if(ruleMatch == true) System.out.println("Rule Match - " + r.name);
 	}
