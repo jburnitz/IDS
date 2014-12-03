@@ -46,8 +46,24 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 
 		byte[] data = ipPacket.getData();
 		String dataString = null;
+
 		try {
 			dataString = new String(data,"UTF-8");
+
+			Pattern p = Pattern.compile(r.recv);
+			Matcher m = p.matcher(dataString);
+			boolean b = m.matches();
+
+			if(b == true) System.out.println("Found match in data");
+			else System.out.println("Did not find match in data");
+
+			p = Pattern.compile(r.send);
+			m = p.matcher(dataString);
+			b = m.matches();
+
+			if(b == true) System.out.println("Found match in send data");
+			else System.out.println("Did not find match in recv data");
+
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -163,6 +179,8 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 						ruleMatch = false;
 						return;
 					}
+
+					
 				}
 				
 				if(r.send.length() > 0)
