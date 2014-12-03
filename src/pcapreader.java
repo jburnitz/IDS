@@ -62,6 +62,18 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 		else return false;
 	}
 
+	public boolean TCPdestPortMatch(TCPPacket t, int port)
+	{
+		if(t.getDestinationPort() == port) return true;
+		else return false;
+	}
+
+	public boolean UDPdestPortMatch(UDPPacket u, int port)
+	{
+		if(u.getDestinationPort() == port) return true;
+		else return false;
+	}
+
 	public boolean UDPsrcPortMatch(UDPPacket u, int port)
 	{
 		if(u.getSourcePort() == port) return true;
@@ -122,7 +134,11 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				//debug
 				System.out.println("Match in protocol (UDP)");
 			}
-			else ruleMatch = false;
+			else
+			{
+				 ruleMatch = false;
+				return;
+			}
 
 			/*
 				MATCH IN SRC IP ADDRESS
@@ -132,13 +148,19 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				if(r.recv == true)
 				{
 					if(srcIPMatch(packet, r.ip) == false)
+					{
 						ruleMatch = false;
+						return;
+					}
 				}
 				
 				if(r.send == true)
 				{
 					if(destIPMatch(packet, r.ip == false)
+					{
 						ruleMatch = false;
+						return;
+					}
 				}
 			}
 
@@ -150,6 +172,19 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				//a specific port on packet's source addr must match
 				
 				//CHECK packet.getSourcePort() depending on tcp/udp
+				if(isTCP(packet) == true && r.proto.equalsIgnoreCase("tcp"))
+				{
+					if(TCPsrcPortMatch((TCPPacket)packet,r.remote_port) == false)
+						ruleMatch = false;
+				}
+				else if(isUDP(packet) == true && r.proto.equalsIgnoreCase("udp"))
+				{
+					if(UDPsrcPortMatch((UDPPacket)packet,r.remote_port) == false)
+						ruleMatch = false;
+				}
+				else ruleMatch = false;	
+
+				
 			}
 			
 			if(!(r.local_port.equals("any")))
@@ -157,6 +192,18 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				//a specific port on user's computer must match the destination addr:port of the packet
 			
 				//CHECK packet.getDestinationPort() depending on tcp/udp
+				if(isTCP(packet) == true && r.proto.equalsIgnoreCase("tcp"))
+				{
+					if(TCPdestPortMatch((TCPPacket)packet,r.local_port) == false)
+						ruleMatch = false;
+				}
+				else if(isUDP(packet) == true && r.proto.equalsIgnoreCase("udp"))
+				{
+					if(UDPdestPortMatch((UDPPacket)packet,r.local_port) == false)
+						ruleMatch = false;
+				}
+				else ruleMatch = false;	
+				
 			}
 
 			if(ruleMatch == true) System.out.println("Rule Match - " + r.name);
