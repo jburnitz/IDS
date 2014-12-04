@@ -49,6 +49,8 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 		String dataString = null;
 
 		try {
+			//grabs byte array of data and translates to string
+
 			dataString = new String(data,"UTF-8");
 
 			Pattern p = Pattern.compile(r.recv);
@@ -239,7 +241,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 							S|A|F|R|P|U
 				int array of input = {isSyn(),isAck(),isFin(),isRst(),isPsh(),isUrg};
 
-				e.g. {0,1,0,1,1,1} means 
+				e.g. {f,t,f,t,t,f} means 
 				
 				for each bit, AND the isAck()...isSyn()
 		
