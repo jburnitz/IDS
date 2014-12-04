@@ -5,14 +5,16 @@ enum Flags{
 	SYN, ACK, FIN, RST, PUSH, URG
 }
 
-class Subrule
+class SubRule
 {
 	String send;
 	String recv;
 	boolean[] flags;
 	
-	Subrule(){
+	public SubRule(){
 		flags = new boolean[6];
+		send = "";
+		recv = "";
 	}
 }
 public class rule
@@ -25,7 +27,7 @@ public class rule
 	String ip;
 	String send;
 	String recv;
-	ArrayList<Subrule> subRules;
+	ArrayList<SubRule> subRules;
 	
 	public rule()
 	{
@@ -37,6 +39,16 @@ public class rule
 		ip = "";
 		send = "";
 		recv = "";
-		subRules = new ArrayList<Subrule>();
+		subRules = new ArrayList<SubRule>();
+	}
+	public void AddSubRule(boolean send, String regexp, boolean[] flags ){
+		SubRule sr = new SubRule();
+		if(send)
+			sr.send = regexp;
+		else
+			sr.recv = regexp;
+		sr.flags = flags;
+		
+		subRules.add(sr);
 	}
 }
