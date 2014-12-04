@@ -6,6 +6,7 @@ import java.util.LinkedList;
  * @author joe
  *
  */
+
 public class parser{
 	protected LinkedList<rule> rules;
 	
@@ -88,33 +89,79 @@ public class parser{
 							continue;
 						}
 						
+						if(left.equalsIgnoreCase("send") ){
+							rules.peekFirst().send = right;
+							//in stream rules, both can't exist recv OR send
+							rules.peekFirst().recv = "";
+							continue;
+						}
+						
+						if(left.equalsIgnoreCase("recv") ){
+							rules.peekFirst().recv.equalsIgnoreCase(right);
+							//in stream rules, both can't exist recv OR send
+							rules.peekFirst().send = "";
+							continue;
+						}
+						
+						/** finishing block for rule */
 						if( left.equalsIgnoreCase("name") ){//means we came across a new rule;
 							i=(j-1); //the (-1) so the name can be handled
 						}
-						
 					}//end STREAM Parse loop
-				}//End IF STREAM Type rule
+				}//End IF TYPE == STREAM
 				else if( right.equalsIgnoreCase("protocol") ){
-					
+					//Go through the protocol rules
+					for(int j=i; j<rulesFile.size(); j++){
+						
+						line = rulesFile.get(j).trim();
+						left = line.split("=")[0];
+						right = line.split("=")[1];
+						
+						if(left.equalsIgnoreCase("local_port")){
+							if(right.equalsIgnoreCase("any"))
+								rules.peekFirst().local_port = 0;
+							else
+								rules.peekFirst().local_port = Integer.parseInt(right);
+							continue;
+						}
+						if(left.equalsIgnoreCase("remote_port") ){
+							if(right.equalsIgnoreCase("any") )
+								rules.peekFirst().remote_port = 0;
+							else
+								rules.peekFirst().remote_port = Integer.parseInt(right);
+							continue;
+						}
+						if(left.equalsIgnoreCase("ip") ){
+							if(right.equalsIgnoreCase("any") )
+								rules.peekFirst().ip = "0.0.0.0";
+							else{
+								rules.peekFirst().ip = right;
+							}
+							continue;
+						}
+						//means we found a subrule
+						if(left.equalsIgnoreCase("send") ){
+							boolean[] flagArray={false, false, false, false, false, false};
+							if(line.contains(" with flags=")){
+								int endIndex = line.lastIndexOf(" with flags=");
+								right=line.substring(5, endIndex );
+								String flags = line.substring(endIndex+12);
+								
+								if(flags.contains("S")){
+									flagArray[0]=true;
+								}
+							}
+							rules.peekFirst().AddSubRule(true, right, flagArray);
+							//in stream rules, both can't exist recv OR send
+							rules.peekFirst().recv = "";
+							continue;
+						}
+						
+					}
 				}
-			}//end IF TYPE == ?
-			
-			if(left.equalsIgnoreCase("send") && rules.peekFirst().type.equalsIgnoreCase("stream") ){
-				rules.peekFirst().send = right;
-				//in stream rules, both can't exist recv OR send
-				rules.peekFirst().recv = "";
-				continue;
-			}
-			if(left.equalsIgnoreCase("recv") && rules.peekFirst().type.equalsIgnoreCase("stream") ){
-				rules.peekFirst().recv.equalsIgnoreCase(right);
-				//in stream rules, both can't exist recv OR send
-				rules.peekFirst().send = "";
-				continue;
-			}
-			
-		}
-		
-	}
+			}//end IF LEFT == TYPE
+		}//END FOR (lines)
+	}//end parser(ArrayList<String> lines) constructor
 
 	public void PrintRules(){
 		for(rule r : rules){
@@ -127,7 +174,7 @@ public class parser{
 			System.out.println("SEND: 		 "+r.send);
 			System.out.println("RECV: 		 "+r.recv);
 			System.out.println("SubRules: ");
-			for( Subrule s : r.subRules )
+			for( SubRule s : r.subRules )
 				System.out.println("FLAGS:		 "+s.flags.toString()+"\n");
 		}
 	}
