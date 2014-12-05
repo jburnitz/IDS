@@ -176,13 +176,13 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			if(b == true){ System.out.println("Found match in send data"); sendMatch = true;}
 			else System.out.println("Did not find match in send data");
 			
-			if(dataString.equals(r.recv))
+			if(dataString.contains(r.recv))
 			{
 				recvMatch = true;
 				System.out.println("Found match in recv string");
 			}
 				
-			if(dataString.equals(r.send))
+			if(dataString.contains(r.send))
 			{
 				sendMatch = true;
 				System.out.println("Found match in send string");
