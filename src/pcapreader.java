@@ -128,7 +128,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			/*
 				MATCH IN PROTOCOL
 			*/
-			if(r.type.equalsIgnoreCase("protcol"))
+			if(r.type.equalsIgnoreCase("protocol"))
 			{
 				if(isTCP(packet) == true && r.proto.equalsIgnoreCase("tcp")){
 					//debug
@@ -141,7 +141,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				}
 				else
 				{
-					System.out.println("incompatible protocls");
+					System.out.println("incompatible protocols");
 					 ruleMatch = false;
 					return;
 				}
