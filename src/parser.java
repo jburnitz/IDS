@@ -106,6 +106,7 @@ public class parser{
 						/** finishing block for rule */
 						if( left.equalsIgnoreCase("name") ){//means we came across a new rule;
 							i=(j-1); //the (-1) so the name can be handled
+							break;
 						}
 					}//end STREAM Parse loop
 				}//End IF TYPE == STREAM
@@ -116,6 +117,11 @@ public class parser{
 						line = rulesFile.get(j).trim();
 						left = line.split("=")[0];
 						right = line.split("=")[1];
+						
+						if(left.equalsIgnoreCase("proto")){
+							rules.peekFirst().proto = right;
+							continue;
+						}
 						
 						if(left.equalsIgnoreCase("local_port")){
 							if(right.equalsIgnoreCase("any"))
@@ -140,29 +146,49 @@ public class parser{
 							continue;
 						}
 						//means we found a subrule
-						if(left.equalsIgnoreCase("send") ){
+						if(left.equalsIgnoreCase("send") || left.equalsIgnoreCase("recv") ){
+							
 							boolean[] flagArray={false, false, false, false, false, false};
 							if(line.contains(" with flags=")){
 								int endIndex = line.lastIndexOf(" with flags=");
 								right=line.substring(5, endIndex );
-								String flags = line.substring(endIndex+12);
+								String flagsStr = line.substring(endIndex+12);
 								
-								if(flags.contains("S")){
+								if(flagsStr.contains("S"))
 									flagArray[0]=true;
-								}
-							}
-							rules.peekFirst().AddSubRule(true, right, flagArray);
-							//in stream rules, both can't exist recv OR send
-							rules.peekFirst().recv = "";
+								if(flagsStr.contains("A"))
+									flagArray[1]=true;
+								if(flagsStr.contains("F"))
+									flagArray[2]=true;
+								if(flagsStr.contains("R"))
+									flagArray[3]=true;
+								if(flagsStr.contains("P"))
+									flagArray[4]=true;
+								if(flagsStr.contains("U"))
+									flagArray[5]=true;
+							}//end flag parsing
+							
+							if(left.equalsIgnoreCase("send") )
+								rules.peekFirst().AddSubRule(true, right, flagArray);
+							else
+								rules.peekFirst().AddSubRule(false, right, flagArray);
+							
+							//get the next rule/subrule
 							continue;
-						}
+						}//End SEND or RECV / or subrule
 						
-					}
+						/** finishing block for rule */
+						if( left.equalsIgnoreCase("name") ){//means we came across a new rule;
+							i=(j-1); //the (-1) so the name can be handled
+							break;
+						}
+							
+					}//END Protocol rule loop
 				}
 			}//end IF LEFT == TYPE
 		}//END FOR (lines)
 	}//end parser(ArrayList<String> lines) constructor
-
+	
 	public void PrintRules(){
 		for(rule r : rules){
 			System.out.println("Name: 		 "+r.name);
@@ -171,11 +197,26 @@ public class parser{
 			System.out.println("Local port:  "+r.local_port);
 			System.out.println("Remote port: "+r.remote_port);
 			System.out.println("IP:			 "+r.ip);
-			System.out.println("SEND: 		 "+r.send);
-			System.out.println("RECV: 		 "+r.recv);
+			if(r.proto.equalsIgnoreCase("tcp")){
+					if(!r.send.isEmpty())
+						System.out.println("SEND: 		 "+r.send);
+					if(!r.recv.isEmpty())
+						System.out.println("RECV: 		 "+r.recv);
+			}
 			System.out.println("SubRules: ");
-			for( SubRule s : r.subRules )
-				System.out.println("FLAGS:		 "+s.flags.toString()+"\n");
+			for( SubRule s : r.subRules ){
+				if(!s.recv.isEmpty())
+					System.out.print(s.recv);
+				else
+					System.out.print(s.send);
+				
+				System.out.print("  Flags: ");
+				for( boolean b : s.flags)
+					System.out.print(Boolean.toString(b));
+				
+				System.out.println();
+			}
+			
 		}
 	}
 
