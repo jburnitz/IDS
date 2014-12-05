@@ -1,6 +1,8 @@
 import java.util.*;
 import java.io.*;
 
+import net.sourceforge.jpcap.capture.CapturePacketException;
+
 /**
  * Java Instrusion Detection System
  * For CS 487 Secure Computer Systems at UIC
@@ -14,26 +16,27 @@ public class snids {
 		
 		//Basic error checking
 		if(args.length!=2){
+			System.err.println("Fatal: Two arguments needed");
 			usage();
 			System.exit(-1);
 		}
 
-		File rules = new File(args[1]);
+		File rulesFile = new File(args[0]);
 			
-		if(!rules.exists()){
-			System.err.println("Fatal: File '"+rules.getName()+"' does not exist");
+		if(!rulesFile.exists()){
+			System.err.println("Fatal: File '"+rulesFile.getName()+"' does not exist");
 			System.exit(-21);
 		}
-		if(!rules.isFile()){
-			System.err.println("Fatal: File '"+rules.getName()+"' is not a file");
+		if(!rulesFile.isFile()){
+			System.err.println("Fatal: File '"+rulesFile.getName()+"' is not a file");
 			System.exit(-31);
 		}
-		if(!rules.canRead()){
-			System.err.println("Fatal: File '"+rules.getName()+"' is not readable");
+		if(!rulesFile.canRead()){
+			System.err.println("Fatal: File '"+rulesFile.getName()+"' is not readable");
 			System.exit(-41);
 		}
 		
-		File pcap = new File(args[2]);
+		File pcap = new File(args[1]);
 		
 		if(!pcap.exists()){
 			System.err.println("Fatal: File '"+pcap.getName()+"' does not exist");
@@ -51,7 +54,7 @@ public class snids {
 		try 
 		{
 			// FileReader reads text files in the default encoding.
-			FileReader fileReader =	new FileReader(rules);
+			FileReader fileReader =	new FileReader(rulesFile);
 			
 			// Always wrap FileReader in BufferedReader.
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -68,8 +71,18 @@ public class snids {
 			//we're done with the file
 			bufferedReader.close();
 			
-			parser ruleParser = new parser((String[]) list.toArray());
-			//ruleParser.parse()
+			parser ruleParser = new parser( list );
+			ruleParser.PrintRules();
+			pcapreader pcr = new pcapreader();
+			ArrayList<rule> rules = new ArrayList<rule>(ruleParser.rules);
+			
+			try {
+				pcr.readFile( args[1], rules );
+			} catch (CapturePacketException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 		catch(FileNotFoundException ex) { //catch exception for file not there
 			System.err.println(
@@ -86,9 +99,6 @@ public class snids {
 	}
 	//How to use the IDS
 	protected static void usage(){
-		//experimental, trying to do something like cout << argv[0] << " <arg_name>"...
-		//String exename = new java.io.File(IDS.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName().toString();
-		//System.out.println( "Usage: " + exename + " <rule_file> <packet_trace_file>" );
 		System.out.println( "Usage: snids <rule_file> <packet_trace_file>" );
 		
 		System.out.println( "Where <rule_file> refers rule file in format:" );

@@ -23,6 +23,9 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 	{
 		setOfAllRules = new ArrayList<rule>();
 	}
+	public PacketCaptureListener(ArrayList<rule> rF){
+		setOfAllRules = rF; 
+	}
 
 	public void setRuleList(ArrayList<rule> r)
 	{
@@ -48,7 +51,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 		System.out.println("Destination of packet : " + ipPacket.getDestinationAddress());	
 
 
-		System.out.println("Packet data as string : " + dataString);
+		//System.out.println("Packet data as string : " + dataString);
 
 		for(rule ru : setOfAllRules)
 		{
@@ -170,7 +173,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			b = m.matches();
 
 			if(b == true){ System.out.println("Found match in send data"); sendMatch = true;}
-			else System.out.println("Did not find match in recv data");
+			else System.out.println("Did not find match in send data");
 
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
@@ -182,6 +185,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				{			//should be compared (according to TA)
 					if(srcIPMatch(packet, r.ip) == false || recvMatch == false )
 					{
+						
 						ruleMatch = false;
 						return;
 					}
@@ -274,7 +278,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 					}
 				}
 
-				if((TCPPacket)packet.isAck() == true)
+				if(((TCPPacket)packet).isAck() == true)
 					System.out.println("ack msg");
 				else
 					System.out.println("no ack msg");
@@ -317,7 +321,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 
 public class pcapreader{
 
-	public static void readFile(String filename, ArrayList<rule> rF) throws CapturePacketException {
+	public void readFile(String filename, ArrayList<rule> rF) throws CapturePacketException {
 		
 		System.out.println("Reading file "+filename);
 		PacketCaptureListener jpcap = new PacketCaptureListener(rF);

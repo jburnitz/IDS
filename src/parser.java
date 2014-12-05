@@ -9,6 +9,7 @@ import java.util.LinkedList;
 
 public class parser{
 	protected LinkedList<rule> rules;
+	protected String host;
 	
 	public parser(ArrayList<String> rulesFile ){
 		rules = new LinkedList<rule>();
@@ -18,6 +19,9 @@ public class parser{
 			System.exit(-51);
 		}
 		
+		////////////////////////////
+		//Rule cleanup		////////
+		////////////////////////////
 		//make sure every populated line has a left and right side
 		//and apparently there aren't comments style defined, but everyone likes #
 		for(int i=0; i<rulesFile.size(); i++){
@@ -33,11 +37,16 @@ public class parser{
 				System.exit(-61);
 			}
 		}
+		
+		/*
+		 * print the cleaned lines
 		for(int i=0; i<rulesFile.size(); i++){
 			//System.out.println(rulesFile.get(i));
 		}
+		*/
+		
 		//get host before looking for rule names
-		String host = rulesFile.get(0).trim().split("=")[1];
+		host = rulesFile.get(0).trim().split("=")[1];
 		//System.out.println("Host is: "+host);
 		String line;
 		String left;
@@ -55,6 +64,7 @@ public class parser{
 				//System.out.println("rules[0]: "+rules.get(0).name);
 				continue;
 			}
+			//Determine if the rule is of Type "stream" or "protocol"
 			if(left.equalsIgnoreCase("type")){
 				rules.peekFirst().type = right;
 				if(right.equalsIgnoreCase("stream") ){
@@ -183,7 +193,12 @@ public class parser{
 							break;
 						}
 							
-					}//END Protocol rule loop
+					}//END Type=Protocol FOR loop
+				}//END Type=Protocol Conditional
+				//the type is unknown, handle the error
+				else{
+					System.err.println("Fatal: Unknown type= ? ");
+					System.exit(-71);
 				}
 			}//end IF LEFT == TYPE
 		}//END FOR (lines)
