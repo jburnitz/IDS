@@ -317,10 +317,37 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 					}
 				}
 
-				if(((TCPPacket)packet).isAck() == true)
-					System.out.println("ack msg");
-				else
-					System.out.println("no ack msg");
+			if(((TCPPacket)packet).isSyn() == true){System.out.println("syn msg");
+				if(sr.flags[0] == false) ruleMatch = false;}
+			else{System.out.println("no syn msg");
+				if(sr.flags[0] == true) ruleMatch = false;}
+			
+			if(((TCPPacket)packet).isAck() == true){System.out.println("ack msg");
+				if(sr.flags[1] == false) ruleMatch = false;}
+			else{System.out.println("no ack msg");
+				if(sr.flags[1] == true) ruleMatch = false;}
+			
+			if(((TCPPacket)packet).isFin() == true){System.out.println("fin msg");
+				if(sr.flags[2] == false) ruleMatch = false;}
+			else{System.out.println("no fin msg");
+				if(sr.flags[2] == true) ruleMatch = false;}
+			
+			if(((TCPPacket)packet).isRst() == true){System.out.println("rst msg");
+				if(sr.flags[3] == false) ruleMatch = false;}
+			else{System.out.println("no rst msg");
+				if(sr.flags[3] == true) ruleMatch = false;}
+			
+			if(((TCPPacket)packet).isPsh() == true){System.out.println("psh msg");
+				if(sr.flags[4] == false) ruleMatch = false;}
+			else{System.out.println("no psh msg");
+				if(sr.flags[4] == true) ruleMatch = false;}
+			
+			if(((TCPPacket)packet).isUrg() == true){System.out.println("urg msg");
+				if(sr.flags[5] == false) ruleMatch = false;}
+			else{System.out.println("no urg msg");
+				if(sr.flags[5] == true) ruleMatch = false;}
+	
+
 				//send/recv stuff
 
 
