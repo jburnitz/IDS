@@ -163,7 +163,7 @@ public class parser{
 								int endIndex = line.lastIndexOf(" with flags=");
 								right=line.substring(5, endIndex );
 								String flagsStr = line.substring(endIndex+12);
-								
+
 								if(flagsStr.contains("S"))
 									flagArray[0]=true;
 								if(flagsStr.contains("A"))
@@ -226,9 +226,10 @@ public class parser{
 					System.out.print(s.send);
 				
 				System.out.print("  Flags: ");
-				for( boolean b : s.flags)
-					System.out.print(Boolean.toString(b));
-				
+				for( int i=0; i<6; i++){
+					if(s.flags[i])
+						System.out.print( " "+Flags.values()[i].toString() );
+				}				
 				System.out.println();
 			}
 			
