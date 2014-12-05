@@ -85,13 +85,13 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 
 	public boolean srcIPMatch(IPPacket p, String addr)
 	{
-		if(p.getSourceAddress().equals(addr)) return true;
+		if(p.getSourceAddress().equals(addr) || addr.equals("0.0.0.0")) return true;
 		else return false;
 	}
 
 	public boolean destIPMatch(IPPacket p, String addr)
 	{
-		if(p.getDestinationAddress().equals(addr)) return true;
+		if(p.getDestinationAddress().equals(addr) || addr.equals("0.0.0.0")) return true;
 		else return false;
 	}
 
@@ -143,7 +143,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				{
 					System.out.println("incompatible protocols");
 					 ruleMatch = false;
-					return;
+					//return;
 				}
 			}
 			
@@ -202,7 +202,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 							System.out.println("Source ip mismatch");
 							
 						ruleMatch = false;
-						return;
+					//	return;
 					}
 
 					
@@ -216,7 +216,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 							System.out.println("destination ip mismatch");
 						
 						ruleMatch = false;
-						return;
+						//return;
 					}
 				}
 
@@ -304,7 +304,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 					if(srcIPMatch(packet, r.ip) == false || recvMatch == false )
 					{
 						ruleMatch = false;
-						return;
+						//return;
 					}
 				}
 				
@@ -313,7 +313,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 					if(destIPMatch(packet, r.ip) == false || sendMatch == false)
 					{
 						ruleMatch = false;
-						return;
+						//return;
 					}
 				}
 
@@ -354,6 +354,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				
 
 			if(ruleMatch == true) System.out.println("Rule Match - " + r.name);
+			else System.out.println("non match");
 	}
 	
 }
