@@ -45,32 +45,6 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 
 		System.out.println("Destination of packet : " + ipPacket.getDestinationAddress());	
 
-		byte[] data = ipPacket.getData();
-		String dataString = null;
-
-		try {
-			//grabs byte array of data and translates to string
-
-			dataString = new String(data,"UTF-8");
-
-			Pattern p = Pattern.compile(r.recv);
-			Matcher m = p.matcher(dataString);
-			boolean b = m.matches();
-
-			if(b == true) System.out.println("Found match in data");
-			else System.out.println("Did not find match in data");
-
-			p = Pattern.compile(r.send);
-			m = p.matcher(dataString);
-			b = m.matches();
-
-			if(b == true) System.out.println("Found match in send data");
-			else System.out.println("Did not find match in recv data");
-
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 		System.out.println("Packet data as string : " + dataString);
 
@@ -170,9 +144,41 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			/*
 				MATCH IN SRC IP ADDRESS OR DEST IP DEPENDING ON NATURE OF PACKET
 			*/
+
+		byte[] data = packet.getData();
+		String dataString;
+
+		boolean recvMatch = false;
+		boolean sendMatch = false;
+
+		try {
+			//grabs byte array of data and translates to string
+
+			dataString = new String(data,"UTF-8");
+
+			Pattern p = Pattern.compile(r.recv);
+			Matcher m = p.matcher(dataString);
+			boolean b = m.matches();
+
+			if(b == true){ System.out.println("Found match in recv data"); recvMatch = true;}
+			else System.out.println("Did not find match in recv data");
+
+			p = Pattern.compile(r.send);
+			m = p.matcher(dataString);
+			b = m.matches();
+
+			if(b == true){ System.out.println("Found match in send data"); sendMatch = true;}
+			else System.out.println("Did not find match in recv data");
+
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
 				if(r.recv.length() > 0) //a message being received indicates the source of the packet
 				{			//should be compared (according to TA)
-					if(srcIPMatch(packet, r.ip) == false)
+					if(srcIPMatch(packet, r.ip) == false || recvMatch == false )
 					{
 						ruleMatch = false;
 						return;
@@ -183,7 +189,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				
 				if(r.send.length() > 0)	//a message being sent indicates the destination of the packet
 				{			//must match
-					if(destIPMatch(packet, r.ip) == false)
+					if(destIPMatch(packet, r.ip) == false || sendMatch == false)
 					{
 						ruleMatch = false;
 						return;
@@ -247,6 +253,32 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 
 			for(SubRule sr : r.subRules)
 			{
+
+				if(sr.recv.length() > 0) //a message being received indicates the source of the packet
+				{			//should be compared (according to TA)
+					if(srcIPMatch(packet, r.ip) == false || recvMatch == false )
+					{
+						ruleMatch = false;
+						return;
+					}
+				}
+				
+				if(sr.send.length() > 0)	//a message being sent indicates the destination of the packet
+				{			//must match
+					if(destIPMatch(packet, r.ip) == false || sendMatch == false)
+					{
+						ruleMatch = false;
+						return;
+					}
+				}
+
+				if((TCPPacket)packet.isAck() == true)
+					System.out.println("ack msg");
+				else
+					System.out.println("no ack msg");
+				//send/recv stuff
+
+
 				/*
 							S|A|F|R|P|U
 				int array of input = {isSyn(),isAck(),isFin(),isRst(),isPsh(),isUrg};
