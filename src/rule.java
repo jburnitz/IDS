@@ -12,7 +12,11 @@ class SubRule
 	boolean[] flags;
 	
 	public SubRule(){
+
+		//S A F R P U
+		//SYN, ACK, FIN, RST, PUSH, URG
 		flags = new boolean[6];
+		//The regexp to match with
 		send = "";
 		recv = "";
 	}
@@ -25,8 +29,12 @@ public class rule
 	int local_port;
 	int remote_port;
 	String ip;
+	
+	//Only send or recv can be occupied at a time
+	//string in form of regexp
 	String send;
 	String recv;
+	//subRules is only occupied when type==protocol
 	ArrayList<SubRule> subRules;
 	
 	public rule()
