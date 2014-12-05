@@ -21,22 +21,24 @@ class SubRule
 		recv = "";
 	}
 }
+
 public class rule
 {
 	String name;
 	String type;
 	String proto;
-	int local_port;
-	int remote_port;
-	String ip;
 	
-	//Only send or recv can be occupied at a time
-	//string in form of regexp
-	String send;
-	String recv;
 	//subRules is only occupied when type==protocol
 	ArrayList<SubRule> subRules;
 	
+	int local_port; //on MY computer
+	int remote_port;	//on the sernder's computer
+	String ip;	//the ip that the packet came from
+
+	String send;	//is this a send or recv message?	
+	String recv;	//
+	String flags;	//
+
 	public rule()
 	{
 		name = "blank rule";
@@ -47,6 +49,7 @@ public class rule
 		ip = "";
 		send = "";
 		recv = "";
+
 		subRules = new ArrayList<SubRule>();
 	}
 	public void AddSubRule(boolean send, String regexp, boolean[] flags ){
