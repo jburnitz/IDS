@@ -161,7 +161,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			//grabs byte array of data and translates to string
 
 			dataString = new String(data,"UTF-8");
-			
+			/*
 			Pattern p = Pattern.compile(r.recv);
 			Matcher m = p.matcher(dataString);
 			boolean b = m.matches();
@@ -175,7 +175,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 
 			if(b == true){ System.out.println("Found match in send data"); sendMatch = true;}
 			else System.out.println("Did not find match in send data");
-			
+			*/
 			if(dataString.contains(r.recv))
 			{
 				recvMatch = true;
@@ -248,11 +248,16 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				{
 					//stream protocol, try casting as tcp packet for now
 					if(TCPsrcPortMatch((TCPPacket)packet,r.remote_port) == false)
-						 ruleMatch = false;	
+					{
+						System.out.println("stream type remote port mismatch");
+						 ruleMatch = false;
+					}
 				}
 				else
+				{
+					System.out.println("Tony sucks at coding");
 					ruleMatch = false;
-				
+				}
 			}
 			
 			if(r.local_port > 0)
@@ -262,22 +267,32 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				//CHECK packet.getDestinationPort() depending on tcp/udp
 				if(isTCP(packet) == true && r.proto.equalsIgnoreCase("tcp"))
 				{
-					if(TCPdestPortMatch((TCPPacket)packet,r.local_port) == false)
+					if(TCPdestPortMatch((TCPPacket)packet,r.local_port) == false){
+						System.out.println("tcp packet mismatch with rule local port");
 						ruleMatch = false;
+					}
 				}
 				else if(isUDP(packet) == true && r.proto.equalsIgnoreCase("udp"))
 				{
 					if(UDPdestPortMatch((UDPPacket)packet,r.local_port) == false)
+					{
+						System.out.println("udp packet mismatch with rule's local port");
 						ruleMatch = false;
+					}
 				}
 				else if(r.type.equalsIgnoreCase("stream"))
 				{
 					if(TCPsrcPortMatch((TCPPacket)packet,r.local_port) == false)
+					{
+						System.out.println("stream packet mismatch with rule's local port");
 						ruleMatch = false;
+					}
 				}
 				else
+				{
+					System.out.println("tony sucks at coding 2: electric boogaloo");
 					ruleMatch = false;	
-				
+				}
 			}
 
 
