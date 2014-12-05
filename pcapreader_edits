@@ -1,30 +1,30 @@
-if(((TCPPacket)packet).isSyn() == true){System.out.println("syn msg");
+if(((TCPPacket)packet).isSyn() == true){System.out.r("syn msg");
 	if(rule.flags[0] == false) ruleMatch = false;}
-else{System.out.println("no syn msg");
+else{System.out.r("no syn msg");
 	if(rule.flags[0] == true) ruleMatch = false;}
 
-if(((TCPPacket)packet).isAck() == true){System.out.println("ack msg");
+if(((TCPPacket)packet).isAck() == true){System.out.r("ack msg");
 	if(rule.flags[1] == false) ruleMatch = false;}
-else{System.out.println("no ack msg");
+else{System.out.r("no ack msg");
 	if(rule.flags[1] == true) ruleMatch = false;}
 
-if(((TCPPacket)packet).isFin() == true){System.out.println("fin msg");
+if(((TCPPacket)packet).isFin() == true){System.out.r("fin msg");
 	if(rule.flags[2] == false) ruleMatch = false;}
-else{System.out.println("no fin msg");
+else{System.out.r("no fin msg");
 	if(rule.flags[2] == true) ruleMatch = false;}
 
-if(((TCPPacket)packet).isRst() == true){System.out.println("rst msg");
+if(((TCPPacket)packet).isRst() == true){System.out.r("rst msg");
 	if(rule.flags[3] == false) ruleMatch = false;}
-else{System.out.println("no rst msg");
+else{System.out.r("no rst msg");
 	if(rule.flags[3] == true) ruleMatch = false;}
 
-if(((TCPPacket)packet).isPsh() == true){System.out.println("psh msg");
+if(((TCPPacket)packet).isPsh() == true){System.out.r("psh msg");
 	if(rule.flags[4] == false) ruleMatch = false;}
-else{System.out.println("no psh msg");
+else{System.out.r("no psh msg");
 	if(rule.flags[4] == true) ruleMatch = false;}
 
-if(((TCPPacket)packet).isUrg() == true){System.out.println("urg msg");
+if(((TCPPacket)packet).isUrg() == true){System.out.r("urg msg");
 	if(rule.flags[5] == false) ruleMatch = false;}
-else{System.out.println("no urg msg");
+else{System.out.r("no urg msg");
 	if(rule.flags[5] == true) ruleMatch = false;}
 	
