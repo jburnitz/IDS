@@ -77,14 +77,6 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 		for(rule ru : setOfAllRules)
 		{
 			comparePacketToRule(ipPacket, ru);
-
-			/*	TODO: implement subrules
-
-				for(subrule sru : ru.subRules)
-				{
-					comparePacketToSubrule(ipPacket,sru);
-				}
-			*/
 		}
 	}
 
@@ -157,26 +149,29 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			/*
 				MATCH IN PROTOCOL
 			*/
-			if(isTCP(packet) == true && r.proto.equals("tcp")){
-				//debug
-				System.out.println("Match in protocol (tcp)");
-			}
-			else if(isUDP(packet) == true && r.proto.equals("udp"))
+			if(r.type.equalsIgnoreCase("protcol"))
 			{
-				//debug
-				System.out.println("Match in protocol (UDP)");
-			}
-			else
-			{
-				 ruleMatch = false;
-				return;
-			}
-
-			/*
-				MATCH IN SRC IP ADDRESS
-			*/
-				if(r.recv.length() > 0)
+				if(isTCP(packet) == true && r.proto.equalsIgnoreCase("tcp")){
+					//debug
+					System.out.println("Match in protocol (tcp)");
+				}
+				else if(isUDP(packet) == true && r.proto.equalsIgnoreCase("udp"))
 				{
+				//debug
+					System.out.println("Match in protocol (UDP)");
+				}
+				else
+				{
+					 ruleMatch = false;
+					return;
+				}
+			}
+			
+			/*
+				MATCH IN SRC IP ADDRESS OR DEST IP DEPENDING ON NATURE OF PACKET
+			*/
+				if(r.recv.length() > 0) //a message being received indicates the source of the packet
+				{			//should be compared (according to TA)
 					if(srcIPMatch(packet, r.ip) == false)
 					{
 						ruleMatch = false;
@@ -186,8 +181,8 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 					
 				}
 				
-				if(r.send.length() > 0)
-				{
+				if(r.send.length() > 0)	//a message being sent indicates the destination of the packet
+				{			//must match
 					if(destIPMatch(packet, r.ip) == false)
 					{
 						ruleMatch = false;
@@ -213,8 +208,14 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 					if(UDPsrcPortMatch((UDPPacket)packet,r.remote_port) == false)
 						ruleMatch = false;
 				}
-				else ruleMatch = false;	
-
+				else if(r.type.equalsIgnoreCase("stream"))
+				{
+					//stream protocol, try casting as tcp packet for now
+					if(TCPsrcPortMatch((TCPPacket)packet,r.remote_port) == false)
+						 ruleMatch = false;	
+				}
+				else
+					ruleMatch = false;
 				
 			}
 			
@@ -233,11 +234,20 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 					if(UDPdestPortMatch((UDPPacket)packet,r.local_port) == false)
 						ruleMatch = false;
 				}
-				else ruleMatch = false;	
+				else if(r.type.equalsIgnoreCase("stream"))
+				{
+					if(TCPsrcPortMatch((TCPPacket)packet,r.local_port) == false)
+						ruleMatch = false;
+				}
+				else
+					ruleMatch = false;	
 				
 			}
 
-			/*
+
+			for(SubRule sr : r.subRules)
+			{
+				/*
 							S|A|F|R|P|U
 				int array of input = {isSyn(),isAck(),isFin(),isRst(),isPsh(),isUrg};
 
@@ -262,7 +272,9 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
           Check the SYN flag, flag indicates the sequence numbers should be synchronized between the sender and receiver to initiate a connection.
 				 boolean 	isUrg()
           Check the URG flag, flag indicates if the urgent pointer is valid.
-			*/	
+			*/
+			}
+				
 
 			if(ruleMatch == true) System.out.println("Rule Match - " + r.name);
 	}
