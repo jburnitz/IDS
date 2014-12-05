@@ -36,7 +36,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 	public void packetArrived(Packet packet) {
 		// TODO Auto-generated method stub
 		System.out.println(packet.toString());
-		System.out.println("foo");
+		//System.out.println("foo");
 		IPPacket ipPacket = (IPPacket)packet;
 
 		if(isTCP(ipPacket) == true ) //means its TCP
@@ -141,6 +141,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				}
 				else
 				{
+					System.out.println("incompatible protocls");
 					 ruleMatch = false;
 					return;
 				}
@@ -160,7 +161,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			//grabs byte array of data and translates to string
 
 			dataString = new String(data,"UTF-8");
-
+			
 			Pattern p = Pattern.compile(r.recv);
 			Matcher m = p.matcher(dataString);
 			boolean b = m.matches();
@@ -174,7 +175,19 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 
 			if(b == true){ System.out.println("Found match in send data"); sendMatch = true;}
 			else System.out.println("Did not find match in send data");
-
+			
+			if(dataString.equals(r.recv))
+			{
+				recvMatch = true;
+				System.out.println("Found match in recv string");
+			}
+				
+			if(dataString.equals(r.send))
+			{
+				sendMatch = true;
+				System.out.println("Found match in send string");
+			}
+			
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -185,7 +198,9 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				{			//should be compared (according to TA)
 					if(srcIPMatch(packet, r.ip) == false || recvMatch == false )
 					{
-						
+						if(srcIPMatch(packet,r.ip) == false)
+							System.out.println("Source ip mismatch");
+							
 						ruleMatch = false;
 						return;
 					}
@@ -197,6 +212,9 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				{			//must match
 					if(destIPMatch(packet, r.ip) == false || sendMatch == false)
 					{
+						if(destIPMatch(packet,r.ip)==false)
+							System.out.println("destination ip mismatch");
+						
 						ruleMatch = false;
 						return;
 					}
@@ -213,12 +231,18 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				if(isTCP(packet) == true && r.proto.equalsIgnoreCase("tcp"))
 				{
 					if(TCPsrcPortMatch((TCPPacket)packet,r.remote_port) == false)
+					{
+						System.out.println("remote port mismatch");
 						ruleMatch = false;
+					}
 				}
 				else if(isUDP(packet) == true && r.proto.equalsIgnoreCase("udp"))
 				{
 					if(UDPsrcPortMatch((UDPPacket)packet,r.remote_port) == false)
+					{
+						System.out.println("remoe port mismatch");
 						ruleMatch = false;
+					}
 				}
 				else if(r.type.equalsIgnoreCase("stream"))
 				{
