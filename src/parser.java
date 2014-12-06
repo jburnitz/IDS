@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.regex.Pattern;
 
 /** 
  * Parses the rules file making concise rule objects
@@ -9,6 +10,7 @@ import java.util.LinkedList;
 
 public class parser{
 	protected LinkedList<rule> rules;
+	protected String host;
 	
 	public parser(ArrayList<String> rulesFile ){
 		rules = new LinkedList<rule>();
@@ -18,6 +20,9 @@ public class parser{
 			System.exit(-51);
 		}
 		
+		////////////////////////////
+		//Rule cleanup		////////
+		////////////////////////////
 		//make sure every populated line has a left and right side
 		//and apparently there aren't comments style defined, but everyone likes #
 		for(int i=0; i<rulesFile.size(); i++){
@@ -33,11 +38,16 @@ public class parser{
 				System.exit(-61);
 			}
 		}
+		
+		/*
+		 * print the cleaned lines
 		for(int i=0; i<rulesFile.size(); i++){
 			//System.out.println(rulesFile.get(i));
 		}
+		*/
+		
 		//get host before looking for rule names
-		String host = rulesFile.get(0).trim().split("=")[1];
+		host = rulesFile.get(0).trim().split("=")[1];
 		//System.out.println("Host is: "+host);
 		String line;
 		String left;
@@ -55,6 +65,7 @@ public class parser{
 				//System.out.println("rules[0]: "+rules.get(0).name);
 				continue;
 			}
+			//Determine if the rule is of Type "stream" or "protocol"
 			if(left.equalsIgnoreCase("type")){
 				rules.peekFirst().type = right;
 				if(right.equalsIgnoreCase("stream") ){
@@ -90,16 +101,25 @@ public class parser{
 						}
 						
 						if(left.equalsIgnoreCase("send") ){
-							rules.peekFirst().send = right;
+							rules.peekFirst().send = true;
+							if(right.length()>1)
+								right = right.substring(1, right.length()-1 );
+							rules.peekFirst().regex = Pattern.compile(right);
 							//in stream rules, both can't exist recv OR send
-							rules.peekFirst().recv = "";
+							//initialized to false
+							//rules.peekFirst().recv = "";
 							continue;
 						}
 						
 						if(left.equalsIgnoreCase("recv") ){
-							rules.peekFirst().recv.equalsIgnoreCase(right);
+							rules.peekFirst().recv = true;
+							if(right.length() > 1 )
+								right = right.substring(1, right.length()-1 );
+							
+							rules.peekFirst().regex = Pattern.compile(right);
 							//in stream rules, both can't exist recv OR send
-							rules.peekFirst().send = "";
+							//initialized to false
+							//rules.peekFirst().send = "";
 							continue;
 						}
 						
@@ -148,12 +168,16 @@ public class parser{
 						//means we found a subrule
 						if(left.equalsIgnoreCase("send") || left.equalsIgnoreCase("recv") ){
 							
+							boolean hasFlags = false;
 							boolean[] flagArray={false, false, false, false, false, false};
+							
 							if(line.contains(" with flags=")){
+								hasFlags = true;
+								
 								int endIndex = line.lastIndexOf(" with flags=");
 								right=line.substring(5, endIndex );
 								String flagsStr = line.substring(endIndex+12);
-								
+
 								if(flagsStr.contains("S"))
 									flagArray[0]=true;
 								if(flagsStr.contains("A"))
@@ -168,10 +192,11 @@ public class parser{
 									flagArray[5]=true;
 							}//end flag parsing
 							
+							//ugly, I know....
 							if(left.equalsIgnoreCase("send") )
-								rules.peekFirst().AddSubRule(true, right, flagArray);
+								rules.peekFirst().AddSubRule(true, right.substring(1, right.length()-1 ), flagArray, hasFlags);
 							else
-								rules.peekFirst().AddSubRule(false, right, flagArray);
+								rules.peekFirst().AddSubRule(false, right.substring(1, right.length()-1 ), flagArray, hasFlags);
 							
 							//get the next rule/subrule
 							continue;
@@ -183,7 +208,12 @@ public class parser{
 							break;
 						}
 							
-					}//END Protocol rule loop
+					}//END Type=Protocol FOR loop
+				}//END Type=Protocol Conditional
+				//the type is unknown, handle the error
+				else{
+					System.err.println("Fatal: Unknown type= ? ");
+					System.exit(-71);
 				}
 			}//end IF LEFT == TYPE
 		}//END FOR (lines)
@@ -197,26 +227,31 @@ public class parser{
 			System.out.println("Local port:  "+r.local_port);
 			System.out.println("Remote port: "+r.remote_port);
 			System.out.println("IP:			 "+r.ip);
-			if(r.proto.equalsIgnoreCase("tcp")){
-					if(!r.send.isEmpty())
-						System.out.println("SEND: 		 "+r.send);
-					if(!r.recv.isEmpty())
-						System.out.println("RECV: 		 "+r.recv);
+			if(r.type.equalsIgnoreCase("stream")){
+					if(r.send == true)
+						System.out.println("SEND: 		 "+r.regex.pattern());
+					if(r.recv == true )
+						System.out.println("RECV: 		 "+r.regex.pattern());
 			}
-			System.out.println("SubRules: ");
-			for( SubRule s : r.subRules ){
-				if(!s.recv.isEmpty())
-					System.out.print(s.recv);
-				else
-					System.out.print(s.send);
-				
-				System.out.print("  Flags: ");
-				for( boolean b : s.flags)
-					System.out.print(Boolean.toString(b));
-				
-				System.out.println();
+			if(!r.subRules.isEmpty()){
+				System.out.println("SubRules: ");
+				for( SubRule s : r.subRules ){
+					if( s.recv == true )
+						System.out.print("S.RECV: "+s.regex.pattern());
+					else
+						System.out.print("S.SEND: "+s.regex.pattern());
+					
+					if( s.hasFlags ){
+						System.out.print("  Flags: ");
+						for( int i=0; i<6; i++)
+						{
+							if(s.flags[i])
+								System.out.print( " "+Flags.values()[i].toString() );
+						}
+					}
+					System.out.println();
+				}
 			}
-			
 		}
 	}
 
