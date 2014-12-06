@@ -195,7 +195,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 
 				if(r.recv.length() > 0) //a message being received indicates the source of the packet
 				{			//should be compared (according to TA)
-					if(srcIPMatch(packet, r.ip) == false || recvMatch == false )
+					if(srcIPMatch(packet, r.ip) == false)
 					{
 						if(srcIPMatch(packet,r.ip) == false)
 							System.out.println("Source ip mismatch");
@@ -207,7 +207,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				
 				if(r.send.length() > 0)	//a message being sent indicates the destination of the packet
 				{			//must match
-					if(destIPMatch(packet, r.ip) == false || sendMatch == false)
+					if(destIPMatch(packet, r.ip) == false)
 					{
 						if(destIPMatch(packet,r.ip)==false)
 							System.out.println("destination ip mismatch");
@@ -295,6 +295,8 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 
 				if(sr.recv.length() > 0) //a message being received indicates the source of the packet
 				{			//should be compared (according to TA)
+					if(dataString.contains(sr.recv)) recvMatch = true;
+					
 					if(srcIPMatch(packet, r.ip) == false || recvMatch == false )
 					{
 						ruleMatch = false;
@@ -304,6 +306,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				
 				if(sr.send.length() > 0)	//a message being sent indicates the destination of the packet
 				{			//must match
+					if(dataString.contains(sr.send)) sendMatch = true;
 					if(destIPMatch(packet, r.ip) == false || sendMatch == false)
 					{
 						ruleMatch = false;
@@ -344,7 +347,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			}
 				
 
-			if(ruleMatch == true) System.out.println("Rule Match - " + r.name);
+			if(ruleMatch == true && sendMatch != false && recvMatch != false) System.out.println("Rule Match - " + r.name);
 			else System.out.println("non match");
 	}
 	
