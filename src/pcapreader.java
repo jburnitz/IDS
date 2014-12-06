@@ -17,6 +17,8 @@ import net.sourceforge.jpcap.net.UDPPacket;
 
 class PacketCaptureListener extends PacketCapture implements PacketListener{
 
+	protected String dataString;
+
 	public ArrayList<rule> setOfAllRules;
 
 	public PacketCaptureListener()
@@ -152,7 +154,6 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			*/
 
 		byte[] data = packet.getData();
-		String dataString;
 
 		boolean recvMatch = false;
 		boolean sendMatch = false;
@@ -297,58 +298,59 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				{			//should be compared (according to TA)
 					if(dataString.contains(sr.recv)) recvMatch = true;
 					
-					if(srcIPMatch(packet, r.ip) == false || recvMatch == false )
+					if(srcIPMatch(packet, r.ip) == false )
 					{
 						ruleMatch = false;
 						//return;
 					}
 				}
+				else recvMatch = true;
 				
 				if(sr.send.length() > 0)	//a message being sent indicates the destination of the packet
 				{			//must match
 					if(dataString.contains(sr.send)) sendMatch = true;
-					if(destIPMatch(packet, r.ip) == false || sendMatch == false)
+					if(destIPMatch(packet, r.ip) == false)
 					{
 						ruleMatch = false;
 						//return;
 					}
 				}
+				else sendMatch = true;
 
 			if(((TCPPacket)packet).isSyn() == true){System.out.println("syn msg");
-				if(sr.flags[0] == false) ruleMatch = false;}
+				if(sr.flags[0] == false) ruleMatch = true;}
 			else{System.out.println("no syn msg");
 				if(sr.flags[0] == true) ruleMatch = false;}
 			
 			if(((TCPPacket)packet).isAck() == true){System.out.println("ack msg");
-				if(sr.flags[1] == false) ruleMatch = false;}
+				if(sr.flags[1] == false) ruleMatch = true;}
 			else{System.out.println("no ack msg");
 				if(sr.flags[1] == true) ruleMatch = false;}
 			
 			if(((TCPPacket)packet).isFin() == true){System.out.println("fin msg");
-				if(sr.flags[2] == false) ruleMatch = false;}
+				if(sr.flags[2] == false) ruleMatch = true;}
 			else{System.out.println("no fin msg");
 				if(sr.flags[2] == true) ruleMatch = false;}
 			
 			if(((TCPPacket)packet).isRst() == true){System.out.println("rst msg");
-				if(sr.flags[3] == false) ruleMatch = false;}
+				if(sr.flags[3] == false) ruleMatch = true;}
 			else{System.out.println("no rst msg");
 				if(sr.flags[3] == true) ruleMatch = false;}
 			
 			if(((TCPPacket)packet).isPsh() == true){System.out.println("psh msg");
-				if(sr.flags[4] == false) ruleMatch = false;}
+				if(sr.flags[4] == false) ruleMatch = true;}
 			else{System.out.println("no psh msg");
 				if(sr.flags[4] == true) ruleMatch = false;}
 			
 			if(((TCPPacket)packet).isUrg() == true){System.out.println("urg msg");
-				if(sr.flags[5] == false) ruleMatch = false;}
+				if(sr.flags[5] == false) ruleMatch = true;}
 			else{System.out.println("no urg msg");
 				if(sr.flags[5] == true) ruleMatch = false;}
 	
 			}
 				
-
 			if(ruleMatch == true && sendMatch != false && recvMatch != false) System.out.println("Rule Match - " + r.name);
-			else System.out.println("non match");
+			else System.out.println("non-match");
 	}
 	
 }
