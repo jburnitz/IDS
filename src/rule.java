@@ -13,15 +13,17 @@ class SubRule
 //	String recv;
 	boolean send;
 	boolean recv;
-	Pattern sendRegex;
-	Pattern recvRegex;
+	Pattern regex;
+	//Pattern recvRegex;
 
+	boolean hasFlags;
 	boolean[] flags;
 	
 	public SubRule(){
 
 		//S A F R P U
 		//SYN, ACK, FIN, RST, PUSH, URG
+		hasFlags = false;
 		flags = new boolean[6];
 		//The regexp to match with
 		send = false;
@@ -44,8 +46,8 @@ public class rule
 
 	boolean send;	//is this a send or recv message?	
 	boolean recv;	//
-	Pattern sendRegex;
-	Pattern recvRegex;
+	Pattern regex;
+	//Pattern recvRegex;
 	String flags;	//
 
 	public rule()
@@ -61,17 +63,17 @@ public class rule
 
 		subRules = new ArrayList<SubRule>();
 	}
-	public void AddSubRule(boolean send, String regexp, boolean[] flags ){
+	public void AddSubRule(boolean send, String regexp, boolean[] flags, boolean hasFlags ){
 		SubRule sr = new SubRule();
-		if(send==true){
-			sr.send = true;
-			sr.sendRegex = Pattern.compile(regexp);
-		}
-		else{
-			sr.recv = true;		
-			sr.recvRegex = Pattern.compile(regexp);
-		}
 		
+		if( send )
+			sr.send = true;
+		else
+			sr.recv = true;
+		
+		sr.regex = Pattern.compile(regexp);
+		
+		sr.hasFlags = hasFlags;
 		sr.flags = flags;
 		subRules.add(sr);
 	}

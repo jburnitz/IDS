@@ -104,7 +104,7 @@ public class parser{
 							rules.peekFirst().send = true;
 							if(right.length()>1)
 								right = right.substring(1, right.length()-1 );
-							rules.peekFirst().sendRegex = Pattern.compile(right);
+							rules.peekFirst().regex = Pattern.compile(right);
 							//in stream rules, both can't exist recv OR send
 							//initialized to false
 							//rules.peekFirst().recv = "";
@@ -116,7 +116,7 @@ public class parser{
 							if(right.length() > 1 )
 								right = right.substring(1, right.length()-1 );
 							
-							rules.peekFirst().recvRegex = Pattern.compile(right);
+							rules.peekFirst().regex = Pattern.compile(right);
 							//in stream rules, both can't exist recv OR send
 							//initialized to false
 							//rules.peekFirst().send = "";
@@ -168,8 +168,12 @@ public class parser{
 						//means we found a subrule
 						if(left.equalsIgnoreCase("send") || left.equalsIgnoreCase("recv") ){
 							
+							boolean hasFlags = false;
 							boolean[] flagArray={false, false, false, false, false, false};
+							
 							if(line.contains(" with flags=")){
+								hasFlags = true;
+								
 								int endIndex = line.lastIndexOf(" with flags=");
 								right=line.substring(5, endIndex );
 								String flagsStr = line.substring(endIndex+12);
@@ -188,10 +192,11 @@ public class parser{
 									flagArray[5]=true;
 							}//end flag parsing
 							
+							//ugly, I know....
 							if(left.equalsIgnoreCase("send") )
-								rules.peekFirst().AddSubRule(true, right.substring(1, right.length()-1 ), flagArray);
+								rules.peekFirst().AddSubRule(true, right.substring(1, right.length()-1 ), flagArray, hasFlags);
 							else
-								rules.peekFirst().AddSubRule(false, right.substring(1, right.length()-1 ), flagArray);
+								rules.peekFirst().AddSubRule(false, right.substring(1, right.length()-1 ), flagArray, hasFlags);
 							
 							//get the next rule/subrule
 							continue;
@@ -224,23 +229,26 @@ public class parser{
 			System.out.println("IP:			 "+r.ip);
 			if(r.type.equalsIgnoreCase("stream")){
 					if(r.send == true)
-						System.out.println("SEND: 		 "+r.sendRegex.pattern());
+						System.out.println("SEND: 		 "+r.regex.pattern());
 					if(r.recv == true )
-						System.out.println("RECV: 		 "+r.recvRegex.pattern());
+						System.out.println("RECV: 		 "+r.regex.pattern());
 			}
 			if(!r.subRules.isEmpty()){
 				System.out.println("SubRules: ");
 				for( SubRule s : r.subRules ){
 					if( s.recv == true )
-						System.out.print("S.RECV: "+s.recvRegex.pattern());
+						System.out.print("S.RECV: "+s.regex.pattern());
 					else
-						System.out.print("S.SEND: "+s.sendRegex.pattern());
+						System.out.print("S.SEND: "+s.regex.pattern());
 					
-					System.out.print("  Flags: ");
-					for( int i=0; i<6; i++){
-						if(s.flags[i])
-							System.out.print( " "+Flags.values()[i].toString() );
-					}				
+					if( s.hasFlags ){
+						System.out.print("  Flags: ");
+						for( int i=0; i<6; i++)
+						{
+							if(s.flags[i])
+								System.out.print( " "+Flags.values()[i].toString() );
+						}
+					}
 					System.out.println();
 				}
 			}
