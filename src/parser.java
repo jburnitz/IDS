@@ -107,7 +107,7 @@ public class parser{
 						}
 						
 						if(left.equalsIgnoreCase("recv") ){
-							rules.peekFirst().recv.equalsIgnoreCase(right);
+							rules.peekFirst().recv = right;
 							//in stream rules, both can't exist recv OR send
 							rules.peekFirst().send = "";
 							continue;
@@ -212,27 +212,28 @@ public class parser{
 			System.out.println("Local port:  "+r.local_port);
 			System.out.println("Remote port: "+r.remote_port);
 			System.out.println("IP:			 "+r.ip);
-			if(r.proto.equalsIgnoreCase("tcp")){
+			if(r.type.equalsIgnoreCase("stream")){
 					if(!r.send.isEmpty())
 						System.out.println("SEND: 		 "+r.send);
-					if(!r.recv.isEmpty())
+					if(!r.recv.isEmpty() || !r.recv.equals("") )
 						System.out.println("RECV: 		 "+r.recv);
 			}
-			System.out.println("SubRules: ");
-			for( SubRule s : r.subRules ){
-				if(!s.recv.isEmpty())
-					System.out.print(s.recv);
-				else
-					System.out.print(s.send);
-				
-				System.out.print("  Flags: ");
-				for( int i=0; i<6; i++){
-					if(s.flags[i])
-						System.out.print( " "+Flags.values()[i].toString() );
-				}				
-				System.out.println();
+			if(!r.subRules.isEmpty()){
+				System.out.println("SubRules: ");
+				for( SubRule s : r.subRules ){
+					if(!s.recv.isEmpty())
+						System.out.print(s.recv);
+					else
+						System.out.print(s.send);
+					
+					System.out.print("  Flags: ");
+					for( int i=0; i<6; i++){
+						if(s.flags[i])
+							System.out.print( " "+Flags.values()[i].toString() );
+					}				
+					System.out.println();
+				}
 			}
-			
 		}
 	}
 

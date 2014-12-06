@@ -176,13 +176,13 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			if(b == true){ System.out.println("Found match in send data"); sendMatch = true;}
 			else System.out.println("Did not find match in send data");
 			*/
-			if(dataString.contains(r.recv) || dataString.matches(r.recv))
+			if( r.recv.length()>0 && (dataString.contains(r.recv) || dataString.matches(r.recv)))
 			{
 				recvMatch = true;
 				System.out.println("Found match in recv string");
 			}
 				
-			if(dataString.contains(r.send) || dataString.matches(r.send))
+			if( r.send.length()>0 && (dataString.contains(r.send) || dataString.matches(r.send)) )
 			{
 				sendMatch = true;
 				System.out.println("Found match in send string");
@@ -193,7 +193,6 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			e.printStackTrace();
 		}
 
-
 				if(r.recv.length() > 0) //a message being received indicates the source of the packet
 				{			//should be compared (according to TA)
 					if(srcIPMatch(packet, r.ip) == false || recvMatch == false )
@@ -203,9 +202,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 							
 						ruleMatch = false;
 					//	return;
-					}
-
-					
+					}	
 				}
 				
 				if(r.send.length() > 0)	//a message being sent indicates the destination of the packet
@@ -220,9 +217,6 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 					}
 				}
 
-			/*
-				TODO: MATCHING PORTS BETWEEN PACKET/RULE
-			*/
 			if(r.remote_port > 0)
 			{
 				//a specific port on packet's source addr must match
@@ -347,36 +341,6 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			else{System.out.println("no urg msg");
 				if(sr.flags[5] == true) ruleMatch = false;}
 	
-
-				//send/recv stuff
-
-
-				/*
-							S|A|F|R|P|U
-				int array of input = {isSyn(),isAck(),isFin(),isRst(),isPsh(),isUrg};
-
-				e.g. {f,t,f,t,t,f} means 
-				
-				for each bit, AND the isAck()...isSyn()
-		
-				if the array is changed their is no match		
-		
-				Compare flags
-
-				for a tcp:
-				  boolean 	isAck()
-          Check the ACK flag, flag indicates if the ack number is valid.
-				 boolean 	isFin()
-          Check the FIN flag, flag indicates the sender is finished sending.
-				 boolean 	isPsh()
-          Check the PSH flag, flag indicates the receiver should pass the data to the application as soon as possible.
-				 boolean 	isRst()
-          Check the RST flag, flag indicates the session should be reset between the sender and the receiver.
-				 boolean 	isSyn()
-          Check the SYN flag, flag indicates the sequence numbers should be synchronized between the sender and receiver to initiate a connection.
-				 boolean 	isUrg()
-          Check the URG flag, flag indicates if the urgent pointer is valid.
-			*/
 			}
 				
 
@@ -413,11 +377,4 @@ public class pcapreader{
 			e.printStackTrace();
 		}
 	}
-	
-/*	public static void main(String[] args) throws CapturePacketException
-	{
-		System.out.println("Begin capture");
-		readFile("trace1.pcap");
-		
-	}*/
 }
