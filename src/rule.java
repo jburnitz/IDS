@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+//import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 enum Flags{
 	//S A F R P U
@@ -7,8 +9,13 @@ enum Flags{
 
 class SubRule
 {
-	String send;
-	String recv;
+//	String send;
+//	String recv;
+	boolean send;
+	boolean recv;
+	Pattern sendRegex;
+	Pattern recvRegex;
+
 	boolean[] flags;
 	
 	public SubRule(){
@@ -17,8 +24,8 @@ class SubRule
 		//SYN, ACK, FIN, RST, PUSH, URG
 		flags = new boolean[6];
 		//The regexp to match with
-		send = "";
-		recv = "";
+		send = false;
+		recv = false;
 	}
 }
 
@@ -35,8 +42,10 @@ public class rule
 	int remote_port;	//on the sernder's computer
 	String ip;	//the ip that the packet came from
 
-	String send;	//is this a send or recv message?	
-	String recv;	//
+	boolean send;	//is this a send or recv message?	
+	boolean recv;	//
+	Pattern sendRegex;
+	Pattern recvRegex;
 	String flags;	//
 
 	public rule()
@@ -47,19 +56,23 @@ public class rule
 		local_port = 0;
 		remote_port = 0;
 		ip = "";
-		send = "";
-		recv = "";
+		send = false;
+		recv = false;
 
 		subRules = new ArrayList<SubRule>();
 	}
 	public void AddSubRule(boolean send, String regexp, boolean[] flags ){
 		SubRule sr = new SubRule();
-		if(send)
-			sr.send = regexp;
-		else
-			sr.recv = regexp;
-		sr.flags = flags;
+		if(send==true){
+			sr.send = true;
+			sr.sendRegex = Pattern.compile(regexp);
+		}
+		else{
+			sr.recv = true;		
+			sr.recvRegex = Pattern.compile(regexp);
+		}
 		
+		sr.flags = flags;
 		subRules.add(sr);
 	}
 }

@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.regex.Pattern;
 
 /** 
  * Parses the rules file making concise rule objects
@@ -100,16 +101,25 @@ public class parser{
 						}
 						
 						if(left.equalsIgnoreCase("send") ){
-							rules.peekFirst().send = right;
+							rules.peekFirst().send = true;
+							if(right.length()>1)
+								right = right.substring(1, right.length()-1 );
+							rules.peekFirst().sendRegex = Pattern.compile(right);
 							//in stream rules, both can't exist recv OR send
-							rules.peekFirst().recv = "";
+							//initialized to false
+							//rules.peekFirst().recv = "";
 							continue;
 						}
 						
 						if(left.equalsIgnoreCase("recv") ){
-							rules.peekFirst().recv = right;
+							rules.peekFirst().recv = true;
+							if(left.length() > 1 )
+								left = left.substring(1, right.length()-1 );
+							
+							rules.peekFirst().recvRegex = Pattern.compile(right);
 							//in stream rules, both can't exist recv OR send
-							rules.peekFirst().send = "";
+							//initialized to false
+							//rules.peekFirst().send = "";
 							continue;
 						}
 						
@@ -179,9 +189,9 @@ public class parser{
 							}//end flag parsing
 							
 							if(left.equalsIgnoreCase("send") )
-								rules.peekFirst().AddSubRule(true, right, flagArray);
+								rules.peekFirst().AddSubRule(true, right.substring(1, right.length()-1 ), flagArray);
 							else
-								rules.peekFirst().AddSubRule(false, right, flagArray);
+								rules.peekFirst().AddSubRule(false, right.substring(1, right.length()-1 ), flagArray);
 							
 							//get the next rule/subrule
 							continue;
@@ -213,18 +223,18 @@ public class parser{
 			System.out.println("Remote port: "+r.remote_port);
 			System.out.println("IP:			 "+r.ip);
 			if(r.type.equalsIgnoreCase("stream")){
-					if(!r.send.isEmpty())
+					if(r.send == true)
 						System.out.println("SEND: 		 "+r.send);
-					if(!r.recv.isEmpty() || !r.recv.equals("") )
+					if(r.recv == true )
 						System.out.println("RECV: 		 "+r.recv);
 			}
 			if(!r.subRules.isEmpty()){
 				System.out.println("SubRules: ");
 				for( SubRule s : r.subRules ){
-					if(!s.recv.isEmpty())
-						System.out.print(s.recv);
+					if( s.recv == true )
+						System.out.print("S.RECV: "+s.recvRegex.pattern());
 					else
-						System.out.print(s.send);
+						System.out.print("S.SEND: "+s.sendRegex.pattern());
 					
 					System.out.print("  Flags: ");
 					for( int i=0; i<6; i++){
