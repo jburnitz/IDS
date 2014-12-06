@@ -96,7 +96,8 @@ public class snids {
 			+ args[0] + "'");
 			System.exit(-41);
 		}
-	}
+		System.exit(0);
+	}//end main
 	//How to use the IDS
 	protected static void usage(){
 		System.out.println( "Usage: snids <rule_file> <packet_trace_file>" );
