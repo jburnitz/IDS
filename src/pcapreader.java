@@ -13,399 +13,318 @@ import net.sourceforge.jpcap.net.TCPPacket;
 import net.sourceforge.jpcap.net.UDPPacket;
 
 
-class ByteCharSequence implements CharSequence {
-
-    private final byte[] data;
-    private final int length;
-    private final int offset;
-
-    public ByteCharSequence(byte[] data) {
-        this(data, 0, data.length);
-    }
-
-    public ByteCharSequence(byte[] data, int offset, int length) {
-        this.data = data;
-        this.offset = offset;
-        this.length = length;
-    }
-
-    @Override
-    public int length() {
-        return this.length;
-    }
-
-    @Override
-    public char charAt(int index) {
-        return (char) (data[offset + index] & 0xff);
-    }
-
-    @Override
-    public CharSequence subSequence(int start, int end) {
-        return new ByteCharSequence(data, offset + start, end - start);
-    }
-
-}
-
-class PacketCaptureListener extends PacketCapture implements PacketListener{
+class PacketCaptureListener extends PacketCapture implements PacketListener {
 
 	protected String dataString;
-
 	public ArrayList<rule> setOfAllRules;
 
-	public PacketCaptureListener()
-	{
+	public PacketCaptureListener() {
 		setOfAllRules = new ArrayList<rule>();
 	}
-	public PacketCaptureListener(ArrayList<rule> rF){
-		setOfAllRules = rF; 
+
+	public PacketCaptureListener(ArrayList<rule> rF) {
+		setOfAllRules = rF;
 	}
 
-	public void setRuleList(ArrayList<rule> r)
-	{
+	public void setRuleList(ArrayList<rule> r) {
 		setOfAllRules = r;
 	}
-	
+
+	public boolean FlagsMatch(IPPacket packet, SubRule sr) {
+		TCPPacket p = (TCPPacket) packet;
+		boolean flagsMatch = true;
+
+		flagsMatch = (p.isSyn() == sr.flags[0]) & (p.isAck() == sr.flags[1])
+				& (p.isFin() == sr.flags[2]) & (p.isRst() == sr.flags[3])
+				& (p.isPsh() == sr.flags[4]) & (p.isUrg() == sr.flags[5]);
+
+		return flagsMatch;
+	}
+
 	@Override
 	public void packetArrived(Packet packet) {
 		// TODO Auto-generated method stub
 		System.out.println(packet.toString());
-		//System.out.println("foo");
-		IPPacket ipPacket = (IPPacket)packet;
-
-		if(isTCP(ipPacket) == true ) //means its TCP
-			System.out.println("TCP packet from " + ipPacket.getSourceAddress() + " : " + ((TCPPacket)ipPacket).getSourcePort());
-		else if(isUDP(ipPacket) == true)
-		{	//a udp packet
-			System.out.println("UDP packet from " + ipPacket.getSourceAddress() + " : " + ((UDPPacket)ipPacket).getSourcePort());		
-		}
-		else System.out.println("Packet of unknown protocol (" +ipPacket.getProtocol() + ") from " + ipPacket.getSourceAddress());
-
-
-		System.out.println("Destination of packet : " + ipPacket.getDestinationAddress());	
-
-
-		//System.out.println("Packet data as string : " + dataString);
-
-		for(rule ru : setOfAllRules)
-		{
+		
+		IPPacket ipPacket = (IPPacket) packet;
+		
+		for (rule ru : setOfAllRules) {
 			comparePacketToRule(ipPacket, ru);
 		}
 	}
 
-	public boolean TCPsrcPortMatch(TCPPacket t, int port)
-	{
-		if(port == 0) return true; 
-		if(t.getSourcePort() == port) return true;
-		else return false;
+	public boolean TCPsrcPortMatch(TCPPacket t, int port) {
+		if (port == 0)
+			return true;
+		if (t.getSourcePort() == port)
+			return true;
+		else
+			return false;
+		/** TODO
+		 * easier code
+		 if (port == 0)
+		 	return true;
+		 return (t.geSourcePort() == port);
+		 */
 	}
 
-	public boolean TCPdestPortMatch(TCPPacket t, int port)
-	{
-		if(port == 0) return true;
-		if(t.getDestinationPort() == port) return true;
-		else return false;
+	public boolean TCPdestPortMatch(TCPPacket t, int port) {
+		if (port == 0)
+			return true;
+		if (t.getDestinationPort() == port)
+			return true;
+		else
+			return false;
 	}
 
-	public boolean UDPdestPortMatch(UDPPacket u, int port)
-	{
-		if(port == 0) return true;
-		if(u.getDestinationPort() == port) return true;
-		else return false;
+	public boolean UDPdestPortMatch(UDPPacket u, int port) {
+		if (port == 0)
+			return true;
+		if (u.getDestinationPort() == port)
+			return true;
+		else
+			return false;
 	}
 
-	public boolean UDPsrcPortMatch(UDPPacket u, int port)
-	{
-		if(port == 0) return true;
-		if(u.getSourcePort() == port) return true;
-		else return false;
+	public boolean UDPsrcPortMatch(UDPPacket u, int port) {
+		if (port == 0)
+			return true;
+		if (u.getSourcePort() == port)
+			return true;
+		else
+			return false;
 	}
 
-	public boolean srcIPMatch(IPPacket p, String addr)
-	{
-		if(p.getSourceAddress().equals(addr) || addr.equals("0.0.0.0")) return true;
-		else return false;
+	public boolean srcIPMatch(IPPacket p, String addr) {
+		if (p.getSourceAddress().equals(addr) || addr.equals("0.0.0.0"))
+			return true;
+		else
+			return false;
 	}
 
-	public boolean destIPMatch(IPPacket p, String addr)
-	{
-		if(p.getDestinationAddress().equals(addr) || addr.equals("0.0.0.0")) return true;
-		else return false;
+	public boolean destIPMatch(IPPacket p, String addr) {
+		if (p.getDestinationAddress().equals(addr) || addr.equals("0.0.0.0"))
+			return true;
+		else
+			return false;
 	}
 
-	public boolean isTCP(IPPacket p)
-	{
-		if(p.getProtocol() == 6) return true;
-		else return false;
+	public boolean isTCP(IPPacket p) {
+		if (p.getProtocol() == 6)
+			return true;
+		else
+			return false;
 	}
 
-	public boolean isUDP(IPPacket p)
-	{
-		if(p.getProtocol() == 17) return true;
-		else return false;
+	public boolean isUDP(IPPacket p) {
+		if (p.getProtocol() == 17)
+			return true;
+		else
+			return false;
 	}
-
 
 	/*
-		TAs Note: if we see the "recv" in the message, rule.ip must match the packet's SOURCE address
-		if we see the "send" message, rule.ip must match the packet's DESTINATION address
-	*/
-	
-	public void comparePacketToRule(IPPacket packet, rule r)
-	{
-			//compare packet info with a rule object
-			//using the helper methods above
+	 * TAs Note: if we see the "recv" in the message, rule.ip must match the
+	 * packet's SOURCE address if we see the "send" message, rule.ip must match
+	 * the packet's DESTINATION address
+	 */
+
+	public void comparePacketToRule(IPPacket packet, rule r) {
+		// compare packet info with a rule object
+		// using the helper methods above
 		
-			//the goal is to call this method when the
-			//packet arrives to compare it to all rules
+		//we should be comparing the rule to the packet TONY, hint hint
 
-			//print the name of r if we have a match ( all helpers return true)
+		// the goal is to call this method when the
+		// packet arrives to compare it to all rules
 
-			boolean ruleMatch = true;	//change to false if we find something that does not match
-			
-			/*
-				MATCH IN PROTOCOL
-			*/
-			if(r.type.equalsIgnoreCase("protocol"))
-			{
-				if(isTCP(packet) == true && r.proto.equalsIgnoreCase("tcp")){
-					//debug
-					System.out.println("Match in protocol (tcp)");
-				}
-				else if(isUDP(packet) == true && r.proto.equalsIgnoreCase("udp"))
-				{
-				//debug
-					System.out.println("Match in protocol (UDP)");
-				}
-				else
-				{
-					System.out.println("incompatible protocols");
-					 ruleMatch = false;
-					//return;
-				}
+		// print the name of r if we have a match ( all helpers return true)
+
+		boolean ruleMatch = true; // change to false if we find something that
+									// does not match
+
+		/*
+		 * MATCH IN PROTOCOL
+		 */
+		if (r.type.equalsIgnoreCase("protocol")) {
+			if ( r.proto.equalsIgnoreCase("tcp") && isTCP(packet) ) {
+				// debug
+				//System.out.println("Match in protocol (tcp)");
+			} else if ( r.proto.equalsIgnoreCase("udp") && isUDP(packet) ) {
+				// debug
+				//System.out.println("Match in protocol (UDP)");
+			} else {
+				System.out.println("incompatible protocols");
+				ruleMatch = false;
+				return;
 			}
-			
-			/*
-				MATCH IN SRC IP ADDRESS OR DEST IP DEPENDING ON NATURE OF PACKET
-			*/
-
-		byte[] data = packet.getData();
-
-		boolean recvMatch = false;
-		boolean sendMatch = false;
-
-		try {
-			//grabs byte array of data and translates to string
-
-			dataString = new String(data,"UTF-8");
-			/*
-			Pattern p = Pattern.compile(r.recv);
-			Matcher m = p.matcher(dataString);
-			boolean b = m.matches();
-
-			if(b == true){ System.out.println("Found match in recv data"); recvMatch = true;}
-			else System.out.println("Did not find match in recv data");
-
-			p = Pattern.compile(r.send);
-			m = p.matcher(dataString);
-			b = m.matches();
-
-			if(b == true){ System.out.println("Found match in send data"); sendMatch = true;}
-			else System.out.println("Did not find match in send data");
-			*/
-			
-			if( r.recv == true && ((Matcher)r.recvRegex.matcher(dataString)).find() )
-			{
-				recvMatch = true;
-				System.out.println("Found match in recv string");
-			}
-				
-			if( r.send == true && ((Matcher)r.sendRegex.matcher(dataString)).find() )
-			{
-				sendMatch = true;
-				System.out.println("Found match in send string");
-			}
-			
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
-				if(r.recv == true ) //a message being received indicates the source of the packet
-				{			//should be compared (according to TA)
-					if(srcIPMatch(packet, r.ip) == false)
-					{
-						if(srcIPMatch(packet,r.ip) == false)
-							System.out.println("Source ip mismatch");
-							
-						ruleMatch = false;
-					//	return;
-					}	
-				}
-				
-				if(r.send == true )	//a message being sent indicates the destination of the packet
-				{			//must match
-					if(destIPMatch(packet, r.ip) == false)
-					{
-						if(destIPMatch(packet,r.ip)==false)
-							System.out.println("destination ip mismatch");
-						
-						ruleMatch = false;
-						//return;
-					}
-				}
+		/*
+		 * MATCH IN SRC IP ADDRESS OR DEST IP DEPENDING ON NATURE OF PACKET
+		 */
 
-			if(r.remote_port > 0)
+		// this is raw data from the data section of the packet, to be regex'd
+		byte[] data = packet.getData();
+
+		//boolean recvMatch = false;
+		//boolean sendMatch = false;
+
+		try {
+			// grabs byte array of data and translates to string
+			dataString = new String(data, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			dataString = "";
+		}
+
+		Matcher m = null;
+		
+		if( r.recv || r.send ){
+			m = r.regex.matcher(dataString);
+			
+			if( !m.find() ){
+				System.out.println("non-match: Regex not found");
+				ruleMatch = false;
+				return;
+			}
+		}
+		
+
+		/**
+		 * making sure the IP's are correct for the direction of packet
+		 */
+		if (r.recv == true)
+		{
+			if (srcIPMatch(packet, r.ip) == false) {
+				System.out.println("non-match: Source ip mismatch");
+				ruleMatch = false;
+				return;
+			}
+			else if( !destIPMatch(packet, r.ip) ){
+				System.out.println("non-match: Destination ip mismatch");
+				ruleMatch = false;
+				return;
+			}
+		}
+
+		if (r.send == true)
+		{
+			if (destIPMatch(packet, r.ip) == false) {
+				System.out.println("non-match: Destination ip mismatch");
+				ruleMatch = false;
+				return;
+			}
+			else if( !srcIPMatch(packet, r.ip) ){
+				System.out.println("non-match: Source ip mismatch");
+				ruleMatch = false;
+				return;
+			}
+		}
+
+		// "0" means its unspecified
+		if (r.remote_port > 0) {
+			// a specific port on packet's source addr must match
+
+			// CHECK packet.getSourcePort() depending on tcp/udp
+			if (  r.proto.equalsIgnoreCase("tcp") && isTCP(packet) )
 			{
-				//a specific port on packet's source addr must match
-				
-				//CHECK packet.getSourcePort() depending on tcp/udp
-				if(isTCP(packet) == true && r.proto.equalsIgnoreCase("tcp"))
-				{
-					if(TCPsrcPortMatch((TCPPacket)packet,r.remote_port) == false)
-					{
-						System.out.println("remote port mismatch");
-						ruleMatch = false;
-					}
-				}
-				else if(isUDP(packet) == true && r.proto.equalsIgnoreCase("udp"))
-				{
-					if(UDPsrcPortMatch((UDPPacket)packet,r.remote_port) == false)
-					{
-						System.out.println("remoe port mismatch");
-						ruleMatch = false;
-					}
-				}
-				else if(r.type.equalsIgnoreCase("stream"))
-				{
-					//stream protocol, try casting as tcp packet for now
-					if(TCPsrcPortMatch((TCPPacket)packet,r.remote_port) == false)
-					{
-						System.out.println("stream type remote port mismatch");
-						 ruleMatch = false;
-					}
-				}
-				else
-				{
-					System.out.println("Tony sucks at coding");
+				if (TCPsrcPortMatch((TCPPacket) packet, r.remote_port) == false) {
+					System.out.println("non-match: remote port mismatch");
 					ruleMatch = false;
+					return;
 				}
-			}
-			
-			if(r.local_port > 0)
+			} 
+			else if (  r.proto.equalsIgnoreCase("udp") && isUDP(packet) )
 			{
-				//a specific port on user's computer must match the destination addr:port of the packet
-				//CHECK packet.getDestinationPort() depending on tcp/udp
-				
-				if(isTCP(packet) == true && r.proto.equalsIgnoreCase("tcp"))
+				if ( UDPsrcPortMatch((UDPPacket) packet, r.remote_port)== false )
 				{
-					if(TCPdestPortMatch((TCPPacket)packet,r.local_port) == false){
-						System.out.println("tcp packet mismatch with rule local port");
-						ruleMatch = false;
-					}
+					System.out.println("non-match: remote port mismatch");
+					ruleMatch = false;
+					return;
 				}
-				else if(isUDP(packet) == true && r.proto.equalsIgnoreCase("udp"))
-				{
-					if(UDPdestPortMatch((UDPPacket)packet,r.local_port) == false)
-					{
-						System.out.println("udp packet mismatch with rule's local port");
-						ruleMatch = false;
-					}
-				}
-				else if(r.type.equalsIgnoreCase("stream"))
-				{
-					if(TCPdestPortMatch((TCPPacket)packet,r.local_port) == false)
-					{
-						System.out.println("stream packet mismatch with rule's local port");
-						ruleMatch = false;
-					}
-				}
-				else
-				{
-					System.out.println("tony sucks at coding 2: electric boogaloo");
-					ruleMatch = false;	
-				}
-			}
-
-
-			for(SubRule sr : r.subRules)
+			} 
+			else if (r.type.equalsIgnoreCase("stream"))
 			{
-
-				if(sr.recv == true && ((Matcher)sr.recvRegex.matcher(dataString)).find() )
-				{			//should be compared (according to TA)
-					recvMatch = true;
-					
-					if(srcIPMatch(packet, r.ip) == false )
-					{
-						ruleMatch = false;
-					}
+				// stream protocol, try casting as tcp packet for now
+				if ( TCPsrcPortMatch((TCPPacket) packet, r.remote_port) == false)
+				{
+					System.out.println("non-match: stream type remote port mismatch");
+					ruleMatch = false;
+					return;
 				}
-				else recvMatch = false;
-				
-				if(sr.send == true && ((Matcher)sr.sendRegex.matcher(dataString)).find() )	//a message being sent indicates the destination of the packet
-				{			//must match
-					sendMatch = true;
-					if(destIPMatch(packet, r.ip) == false)
-					{
-						ruleMatch = false;
-						//return;
-					}
-				}
-				else sendMatch = false;
+			}
+			else 
+			{
+				System.out.println("Tony sucks at coding :D <====8 ");
+				ruleMatch = false;
+				return;
+			}
+		}
 
-			try {
-				if(((TCPPacket)packet).isSyn() == true){System.out.println("syn msg");
-					} 
-				else{System.out.println("no syn msg");
-					if(sr.flags[0] == true) ruleMatch = false;}
-				
-				if(((TCPPacket)packet).isAck() == true){System.out.println("ack msg");
-					}
-				else{System.out.println("no ack msg");
-					if(sr.flags[1] == true) ruleMatch = false;}
-				
-				if(((TCPPacket)packet).isFin() == true){System.out.println("fin msg");
-					}
-				else{System.out.println("no fin msg");
-					if(sr.flags[2] == true) ruleMatch = false;}
-				
-				if(((TCPPacket)packet).isRst() == true){System.out.println("rst msg");
-					}
-				else{System.out.println("no rst msg");
-					if(sr.flags[3] == true) ruleMatch = false;}
-				
-				if(((TCPPacket)packet).isPsh() == true){System.out.println("psh msg");
-					}
-				else{System.out.println("no psh msg");
-					if(sr.flags[4] == true) ruleMatch = false;}
-				
-				if(((TCPPacket)packet).isUrg() == true){System.out.println("urg msg");
-					}
-				else{System.out.println("no urg msg");
-					if(sr.flags[5] == true) ruleMatch = false;}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
+		if (r.local_port > 0) {
+			// a specific port on user's computer must match the destination
+
+			if ( r.proto.equalsIgnoreCase("tcp") && isTCP(packet) ) {
+				if (TCPdestPortMatch((TCPPacket) packet, r.local_port) == false) {
+					System.out.println("non-match: tcp packet mismatch with rule local port");
+					ruleMatch = false;
+					return;
+				}
+			} else if ( r.proto.equalsIgnoreCase("udp") && isUDP(packet) ) {
+				if (UDPdestPortMatch((UDPPacket) packet, r.local_port) == false) {
+					System.out.println("non-match: udp packet mismatch with rule's local port");
+					ruleMatch = false;
+					return;
+				}
+			} else if ( r.type.equalsIgnoreCase("stream") ) {
+				if (TCPdestPortMatch((TCPPacket) packet, r.local_port) == false) {
+					System.out.println("non-match: stream packet mismatch with rule's local port");
+					ruleMatch = false;
+					return;
+				}
+			} else {
+				System.out.println("tony sucks at coding 2: electric boogaloo");
+				ruleMatch = false;
+				return;
 			}
-			
-			
-				if(sr.recv == false) recvMatch = true;
-				if(sr.send == false) sendMatch = true;
-				if(r.recv == false) recvMatch = true;
-				if(r.send == false) sendMatch = true;
-	
-			}
-				
-			if(ruleMatch == true && sendMatch != false && recvMatch != false) System.out.println("Rule Match - " + r.name);
-			else System.out.println("non-match");
+		}
+
+		/////////////////////
+		/// Sub rule processing
+		///////////////////////
+		for (SubRule sr : r.subRules) {
+			m = sr.regex.matcher(dataString);
+
+			// just so we don't do unecessary regexing, checking if sr.recv
+			//also, ANDing with ruleMatch is unecessary because stuff SHOULD return when false
+			if (sr.recv)
+				ruleMatch = ruleMatch & m.find() & srcIPMatch(packet, r.ip);
+
+			if (sr.send)
+				ruleMatch = ruleMatch & m.find() & destIPMatch(packet, r.ip);
+
+			if (sr.hasFlags)
+				ruleMatch = ruleMatch & FlagsMatch(packet, sr);
+
+		}
+
+		//if (ruleMatch == true && sendMatch != false && recvMatch != false)
+		if( ruleMatch )
+			System.out.println("Rule Match - " + r.name);
+		else
+			System.out.println("non-match");
 	}
-	
+
 }
 
-public class pcapreader{
+public class pcapreader {
 
-	public void readFile(String filename, ArrayList<rule> rF) throws CapturePacketException {
-		
-		System.out.println("Reading file "+filename);
+	public void readFile(String filename, ArrayList<rule> rF)
+			throws CapturePacketException {
+
+		System.out.println("Reading file " + filename);
 		PacketCaptureListener jpcap = new PacketCaptureListener(rF);
 
 		try {
@@ -422,7 +341,7 @@ public class pcapreader{
 			jpcap.setFilter("ip", true);
 			jpcap.addPacketListener(jpcap);
 			jpcap.capture(-1);
-			
+
 		} catch (InvalidFilterException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
