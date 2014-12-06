@@ -72,7 +72,7 @@ public class snids {
 			bufferedReader.close();
 			
 			parser ruleParser = new parser( list );
-			ruleParser.PrintRules();
+			//ruleParser.PrintRules();
 			pcapreader pcr = new pcapreader();
 			ArrayList<rule> rules = new ArrayList<rule>(ruleParser.rules);
 			
