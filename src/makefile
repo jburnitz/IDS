@@ -1,8 +1,7 @@
 # define a variable for compiler flags (JFLAGS)
 # define a variable for the compiler (JC)  
 # define a variable for the Java Virtual Machine (JVM)
-# define a variable for a parameter. When you run make, you could use:
-# make run FILE="Algo.csv" para sobre escribir el valor de FILE. 
+# define a variable for a parameter. When you run make, you could use it
 
 JFLAGS = -g
 JC = javac
@@ -67,23 +66,17 @@ default: classes
 # In the words in the macro named 'macroname' replace 'string1' with 'string2'
 # Below we are replacing the suffix .java of all words in the macro CLASSES 
 # with the .class suffix
-#
 
 classes: $(CLASSES:.java=.class)
 
 
 # Next two lines contain a target for running the program
 # Remember the tab in the second line.
-# $(JMV) y $(MAIN) are replaced by their values
 
 run: $(MAIN).class
 	$(JVM) $(MAIN)
 
-# this line is to remove all unneeded files from
-# the directory when we are finished executing(saves space)
-# and "cleans up" the directory of unneeded .class files
-# RM is a predefined macro in make (RM = rm -f)
-#
+# this line is to remove all unneeded files
 
 clean:
         $(RM) *.class
