@@ -44,7 +44,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 	@Override
 	public void packetArrived(Packet packet) {
 		// TODO Auto-generated method stub
-		System.out.println(packet.toString());
+		//System.out.println(packet.toString());
 		
 		IPPacket ipPacket = (IPPacket) packet;
 		
@@ -185,7 +185,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 			m = r.regex.matcher(dataString);
 			
 			if( !m.find() ){
-				System.out.println("non-match: Regex not found");
+				//System.out.println("non-match: Regex not found");
 				ruleMatch = false;
 				return;
 			}
@@ -314,7 +314,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 		if( ruleMatch )
 			System.out.println("Rule Match - " + r.name);
 		else
-			System.out.println("non-match");
+			System.out.println("non-match: UNKNOWN");
 	}
 
 }
