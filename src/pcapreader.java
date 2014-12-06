@@ -94,24 +94,28 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 
 	public boolean TCPsrcPortMatch(TCPPacket t, int port)
 	{
+		if(port == 0) return true; 
 		if(t.getSourcePort() == port) return true;
 		else return false;
 	}
 
 	public boolean TCPdestPortMatch(TCPPacket t, int port)
 	{
+		if(port == 0) return true;
 		if(t.getDestinationPort() == port) return true;
 		else return false;
 	}
 
 	public boolean UDPdestPortMatch(UDPPacket u, int port)
 	{
+		if(port == 0) return true;
 		if(u.getDestinationPort() == port) return true;
 		else return false;
 	}
 
 	public boolean UDPsrcPortMatch(UDPPacket u, int port)
 	{
+		if(port == 0) return true;
 		if(u.getSourcePort() == port) return true;
 		else return false;
 	}
@@ -290,8 +294,8 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 			if(r.local_port > 0)
 			{
 				//a specific port on user's computer must match the destination addr:port of the packet
-			
 				//CHECK packet.getDestinationPort() depending on tcp/udp
+				
 				if(isTCP(packet) == true && r.proto.equalsIgnoreCase("tcp"))
 				{
 					if(TCPdestPortMatch((TCPPacket)packet,r.local_port) == false){
@@ -309,7 +313,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener{
 				}
 				else if(r.type.equalsIgnoreCase("stream"))
 				{
-					if(TCPsrcPortMatch((TCPPacket)packet,r.local_port) == false)
+					if(TCPdestPortMatch((TCPPacket)packet,r.local_port) == false)
 					{
 						System.out.println("stream packet mismatch with rule's local port");
 						ruleMatch = false;

@@ -113,8 +113,8 @@ public class parser{
 						
 						if(left.equalsIgnoreCase("recv") ){
 							rules.peekFirst().recv = true;
-							if(left.length() > 1 )
-								left = left.substring(1, right.length()-1 );
+							if(right.length() > 1 )
+								right = right.substring(1, right.length()-1 );
 							
 							rules.peekFirst().recvRegex = Pattern.compile(right);
 							//in stream rules, both can't exist recv OR send
@@ -224,9 +224,9 @@ public class parser{
 			System.out.println("IP:			 "+r.ip);
 			if(r.type.equalsIgnoreCase("stream")){
 					if(r.send == true)
-						System.out.println("SEND: 		 "+r.send);
+						System.out.println("SEND: 		 "+r.sendRegex.pattern());
 					if(r.recv == true )
-						System.out.println("RECV: 		 "+r.recv);
+						System.out.println("RECV: 		 "+r.recvRegex.pattern());
 			}
 			if(!r.subRules.isEmpty()){
 				System.out.println("SubRules: ");
