@@ -278,7 +278,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 					return;
 				}
 			} 
-			else if (r.type.equalsIgnoreCase("stream"))
+			else if (r.type.equalsIgnoreCase("stream") && isTCP(packet) )
 			{
 				// stream protocol, try casting as tcp packet for now
 				if ( TCPsrcPortMatch((TCPPacket) packet, r.remote_port) == false)
@@ -315,7 +315,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 					streamMatch = false;
 					return;
 				}
-			} else if ( r.type.equalsIgnoreCase("stream") ) {
+			} else if ( r.type.equalsIgnoreCase("stream") && isTCP(packet) ) {
 				if (TCPdestPortMatch((TCPPacket) packet, r.local_port) == false) {
 					//System.out.println("non-match: stream packet mismatch with rule's local port");
 					ruleMatch = false;
