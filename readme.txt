@@ -27,3 +27,8 @@ NOTES: there should be no user input in this program.
 1: navigate to 'src' folder
 2: in terminal, enter: 'javac *.java'
 3: 'java snids <rule_file> <trace_file>'
+
+KNOWN ISSUES:
+To the best of our knowledge Java regular expression has issues
+ when looking for hexadecimel values. Due to this constraint searching
+ for hex values is adversely affected and can lead to undefined behavior.
