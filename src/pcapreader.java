@@ -42,6 +42,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 		TCPPacket p = (TCPPacket) packet;
 		boolean flagsMatch = true;
 
+		/** TODO Fixe this */
 		flagsMatch = (p.isSyn() == sr.flags[0]) & (p.isAck() == sr.flags[1])
 				& (p.isFin() == sr.flags[2]) & (p.isRst() == sr.flags[3])
 				& (p.isPsh() == sr.flags[4]) & (p.isUrg() == sr.flags[5]);
