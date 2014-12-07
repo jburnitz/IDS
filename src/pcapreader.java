@@ -29,6 +29,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 
 	public PacketCaptureListener(ArrayList<rule> rF) {
 		setOfAllRules = rF;
+		streamDataString = "";
 	}
 
 	public void setRuleList(ArrayList<rule> r) {
@@ -46,6 +47,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 		return flagsMatch;
 	}
 
+	//The "Entry point"
 	@Override
 	public void packetArrived(Packet packet) {
 		// TODO Auto-generated method stub
