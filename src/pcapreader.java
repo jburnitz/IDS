@@ -2,6 +2,8 @@ import java.util.*;
 import java.util.regex.*;
 import java.io.UnsupportedEncodingException;
 
+import javax.xml.bind.DatatypeConverter;
+
 import net.sourceforge.jpcap.capture.CaptureFileOpenException;
 import net.sourceforge.jpcap.capture.CapturePacketException;
 import net.sourceforge.jpcap.capture.InvalidFilterException;
@@ -185,6 +187,9 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 
 		// this is raw data from the data section of the packet, to be regex'd
 		byte[] data = packet.getData();
+		
+		String hex = DatatypeConverter.printHexBinary(array);
+    		System.out.println(hex); // prints 
 
 		try {
 			// grabs byte array of data and translates to string
