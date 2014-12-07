@@ -56,12 +56,12 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 		for (rule ru : setOfAllRules) {
 			comparePacketToRule(ipPacket, ru);
 			
-			if(streamDataString.length > 0 && streamMatch == true)
+			if(streamDataString.length() > 0 && streamMatch == true)
 			{	//only happens in a stream data type
 				//compare the rule recv message or send message to the whole data string
 				
 				/* NOT SURE IF I SHOULD LOOK FOR EACH WORD INDIVIDUALLY, OR THE PATTERN IN ENTIRETY*/
-				Matcher m = r.regex.matcher(streamDataString);
+				Matcher m = ru.regex.matcher(streamDataString);
 				
 				if( m.find())
 					System.out.println("Rule Match - " + ru.name);
@@ -209,7 +209,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 				}
 			}
 		}
-		else if(r.type.equlasIgnoreCase("stream"))
+		else if(r.type.equalsIgnoreCase("stream"))
 		{
 			if(r.recv || r.send)
 			{
