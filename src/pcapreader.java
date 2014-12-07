@@ -294,17 +294,20 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 		for (SubRule sr : r.subRules) {
 			m = sr.regex.matcher(dataString);
 
-			// just so we don't do unecessary regexing, checking if sr.recv
-			//also, ANDing with ruleMatch is unecessary because stuff SHOULD return when false
-			if (sr.recv)
-				ruleMatch = ruleMatch & m.find() & srcIPMatch(packet, r.ip);
-
-			if (sr.send)
-				ruleMatch = ruleMatch & m.find() & destIPMatch(packet, r.ip);
-
 			if (sr.hasFlags)
-				ruleMatch = ruleMatch & FlagsMatch(packet, sr);
+				ruleMatch = FlagsMatch(packet, sr);
 
+			//the subrule is in the correct direction
+			if( (sr.recv && srcIPMatch(packet, r.ip)) || (sr.send && destIPMatch(packet, r.ip) ) ){
+				if( m.find() && ruleMatch ){
+					//we found a match in a subrule, stop checking for others
+					break;	
+				}
+				else
+					ruleMatch = false;
+			}
+			else
+				ruleMatch = false;
 		}
 
 		//if (ruleMatch == true && sendMatch != false && recvMatch != false)
