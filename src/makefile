@@ -79,4 +79,4 @@ run: $(MAIN).class
 # this line is to remove all unneeded files
 
 clean:
-        $(RM) *.class
+	$(RM) *.class
