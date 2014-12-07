@@ -2,7 +2,7 @@ import java.util.*;
 import java.util.regex.*;
 import java.io.UnsupportedEncodingException;
 
-import javax.xml.bind.DatatypeConverter;
+//import javax.xml.bind.DatatypeConverter;
 
 import net.sourceforge.jpcap.capture.CaptureFileOpenException;
 import net.sourceforge.jpcap.capture.CapturePacketException;
@@ -68,7 +68,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 				Matcher m = ru.regex.matcher(streamDataString);
 				
 				if( m.find())
-					System.out.println("Rule Match - " + ru.name);
+					System.out.println(ru.name);
 			}
 		}
 	}
@@ -188,8 +188,8 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 		// this is raw data from the data section of the packet, to be regex'd
 		byte[] data = packet.getData();
 		
-		String hex = DatatypeConverter.printHexBinary(data);
-    		System.out.println(hex); // prints 
+	//	String hex = DatatypeConverter.printHexBinary(data);
+    	//	System.out.println(hex); // prints 
 
 		try {
 			// grabs byte array of data and translates to string
