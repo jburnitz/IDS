@@ -2,6 +2,8 @@ import java.util.*;
 import java.util.regex.*;
 import java.io.UnsupportedEncodingException;
 
+//import javax.xml.bind.DatatypeConverter;
+
 import net.sourceforge.jpcap.capture.CaptureFileOpenException;
 import net.sourceforge.jpcap.capture.CapturePacketException;
 import net.sourceforge.jpcap.capture.InvalidFilterException;
@@ -16,6 +18,11 @@ import net.sourceforge.jpcap.net.UDPPacket;
 class PacketCaptureListener extends PacketCapture implements PacketListener {
 
 	protected String dataString;
+	
+	/* EDIT: this will be appended by all the data in the packets if rule type is STREAM*/
+	protected String streamDataString;
+	boolean streamMatch;
+	
 	public ArrayList<rule> setOfAllRules;
 
 	public PacketCaptureListener() {
@@ -24,6 +31,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 
 	public PacketCaptureListener(ArrayList<rule> rF) {
 		setOfAllRules = rF;
+		streamDataString = "";
 	}
 
 	public void setRuleList(ArrayList<rule> r) {
@@ -41,6 +49,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 		return flagsMatch;
 	}
 
+	//The "Entry point"
 	@Override
 	public void packetArrived(Packet packet) {
 		// TODO Auto-generated method stub
@@ -50,6 +59,17 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 		
 		for (rule ru : setOfAllRules) {
 			comparePacketToRule(ipPacket, ru);
+			
+			if(streamDataString.length() > 0 && streamMatch == true)
+			{	//only happens in a stream data type
+				//compare the rule recv message or send message to the whole data string
+				
+				/* NOT SURE IF I SHOULD LOOK FOR EACH WORD INDIVIDUALLY, OR THE PATTERN IN ENTIRETY*/
+				Matcher m = ru.regex.matcher(streamDataString);
+				
+				if( m.find())
+					System.out.println(ru.name);
+			}
 		}
 	}
 
@@ -142,7 +162,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 
 		boolean ruleMatch = true; // change to false if we find something that
 									// does not match
-
+		streamMatch = true;
 		/*
 		 * MATCH IN PROTOCOL
 		 */
@@ -155,6 +175,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 				//System.out.println("Match in protocol (UDP)");
 			} else {
 				//System.out.println("incompatible protocols");
+				streamMatch = false;
 				ruleMatch = false;
 				return;
 			}
@@ -166,6 +187,9 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 
 		// this is raw data from the data section of the packet, to be regex'd
 		byte[] data = packet.getData();
+		
+	//	String hex = DatatypeConverter.printHexBinary(data);
+    	//	System.out.println(hex); // prints 
 
 		try {
 			// grabs byte array of data and translates to string
@@ -178,16 +202,27 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 
 		Matcher m = null;
 		
-		if( r.recv || r.send ){
-			m = r.regex.matcher(dataString);
-			
-			if( !m.find() ){
+		/*EDIT: if type is stream, append to the data string instead of comparing here*/
+		if(r.type.equalsIgnoreCase("protocol"))
+		{
+			if( r.recv || r.send ){
+				m = r.regex.matcher(dataString);
+				
+				if( !m.find() ){
 				//System.out.println("non-match: Regex not found");
-				ruleMatch = false;
-				return;
+					streamMatch = false;
+					ruleMatch = false;
+					return;
+				}
 			}
 		}
-		
+		else if(r.type.equalsIgnoreCase("stream"))
+		{
+			if(r.recv || r.send)
+			{
+				streamDataString = streamDataString + dataString;	
+			}
+		}
 
 		/**
 		 * making sure the IP's are correct for the direction of packet
@@ -197,11 +232,13 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 			if (srcIPMatch(packet, r.ip) == false) {
 				//System.out.println("non-match: Source ip mismatch");
 				ruleMatch = false;
+				streamMatch = false;
 				return;
 			}
 			else if( !destIPMatch(packet, r.ip) ){
 				//System.out.println("non-match: Destination ip mismatch");
 				ruleMatch = false;
+				streamMatch = false;
 				return;
 			}
 		}
@@ -211,11 +248,13 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 			if (destIPMatch(packet, r.ip) == false) {
 				//System.out.println("non-match: Destination ip mismatch");
 				ruleMatch = false;
+				streamMatch = false;
 				return;
 			}
 			else if( !srcIPMatch(packet, r.ip) ){
 				//System.out.println("non-match: Source ip mismatch");
 				ruleMatch = false;
+				streamMatch = false;
 				return;
 			}
 		}
@@ -230,6 +269,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 				if (TCPsrcPortMatch((TCPPacket) packet, r.remote_port) == false) {
 					//System.out.println("non-match: remote port mismatch");
 					ruleMatch = false;
+					streamMatch = false;
 					return;
 				}
 			} 
@@ -239,16 +279,18 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 				{
 					//System.out.println("non-match: remote port mismatch");
 					ruleMatch = false;
+					streamMatch = false;
 					return;
 				}
 			} 
-			else if (r.type.equalsIgnoreCase("stream"))
+			else if (r.type.equalsIgnoreCase("stream") && isTCP(packet) )
 			{
 				// stream protocol, try casting as tcp packet for now
 				if ( TCPsrcPortMatch((TCPPacket) packet, r.remote_port) == false)
 				{
 					//System.out.println("non-match: stream type remote port mismatch");
 					ruleMatch = false;
+					streamMatch = false;
 					return;
 				}
 			}
@@ -256,6 +298,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 			{
 				//System.out.println("Tony sucks at coding :D <====8 ");
 				ruleMatch = false;
+				streamMatch = false;
 				return;
 			}
 		}
@@ -267,23 +310,27 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 				if (TCPdestPortMatch((TCPPacket) packet, r.local_port) == false) {
 					//System.out.println("non-match: tcp packet mismatch with rule local port");
 					ruleMatch = false;
+					streamMatch = false;
 					return;
 				}
 			} else if ( r.proto.equalsIgnoreCase("udp") && isUDP(packet) ) {
 				if (UDPdestPortMatch((UDPPacket) packet, r.local_port) == false) {
 					//System.out.println("non-match: udp packet mismatch with rule's local port");
 					ruleMatch = false;
+					streamMatch = false;
 					return;
 				}
-			} else if ( r.type.equalsIgnoreCase("stream") ) {
+			} else if ( r.type.equalsIgnoreCase("stream") && isTCP(packet) ) {
 				if (TCPdestPortMatch((TCPPacket) packet, r.local_port) == false) {
 					//System.out.println("non-match: stream packet mismatch with rule's local port");
 					ruleMatch = false;
+					streamMatch = false;
 					return;
 				}
 			} else {
 				//System.out.println("tony sucks at coding 2: electric boogaloo");
 				ruleMatch = false;
+				streamMatch = false;
 				return;
 			}
 		}
@@ -299,19 +346,30 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 
 			//the subrule is in the correct direction
 			if( (sr.recv && srcIPMatch(packet, r.ip)) || (sr.send && destIPMatch(packet, r.ip) ) ){
-				if( m.find() && ruleMatch ){
+				/*EDIT: If stream type, don't compare, just append data*/
+				if(r.type.equalsIgnoreCase("protocol"))
+				{
+					if( m.find() && ruleMatch ){
 					//we found a match in a subrule, stop checking for others
-					break;	
+						break;	
+					}
+					else
+						ruleMatch = false;
+			
+					
 				}
-				else
-					ruleMatch = false;
+				else streamDataString = streamDataString + dataString;
 			}
 			else
+			{
 				ruleMatch = false;
+				streamMatch = false;
+			}	
 		}
 
 		//if (ruleMatch == true && sendMatch != false && recvMatch != false)
-		if( ruleMatch )
+		/* EDIT: only do this for protocol types. in the even of a stream*/
+		if( ruleMatch && r.type.equalsIgnoreCase("protocol"))
 			System.out.println( r.name);
 		//else
 			//System.out.println("non-match: UNKNOWN");
