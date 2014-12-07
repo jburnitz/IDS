@@ -215,7 +215,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 		{
 			if(r.recv || r.send)
 			{
-				streamDataString += dataString;	
+				streamDataString = streamDataString + dataString;	
 			}
 		}
 
@@ -353,7 +353,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 			
 					
 				}
-				else streamDataString += dataString;
+				else streamDataString = streamDataString + dataString;
 			}
 			else
 			{
