@@ -1,0 +1,9 @@
+host=192.168.0.1
+
+name=this is rule 1
+type=protocol
+proto=tcp
+local_port=5551
+remote_port=any
+ip=any
+recv="Now I own your computer"

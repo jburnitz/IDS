@@ -1,0 +1,9 @@
+host=192.168.0.1
+
+name=NULL scan rule 6
+type=protocol
+proto=tcp
+local_port=80
+remote_port=any
+ip=any
+recv=".*" with flags=
