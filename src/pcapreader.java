@@ -188,7 +188,7 @@ class PacketCaptureListener extends PacketCapture implements PacketListener {
 		// this is raw data from the data section of the packet, to be regex'd
 		byte[] data = packet.getData();
 		
-		String hex = DatatypeConverter.printHexBinary(array);
+		String hex = DatatypeConverter.printHexBinary(data);
     		System.out.println(hex); // prints 
 
 		try {
